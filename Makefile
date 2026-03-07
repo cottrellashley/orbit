@@ -1,41 +1,47 @@
 BINARY  := orbit
 CMD     := ./cmd/orbit
-INSTALL := $(GOPATH)/bin/$(BINARY)
 
-.PHONY: build test install clean fmt vet lint check
+.DEFAULT_GOAL := help
 
-## build: compile the orbit binary
+.PHONY: all build test test-short install clean fmt vet check help
+
+## all:        build the orbit binary
+all: build
+
+## build:      compile the orbit binary
 build:
 	go build -o $(BINARY) $(CMD)
 
-## test: run all tests
+## test:       run all tests with verbose output
 test:
 	go test ./... -v
 
-## test-short: run tests without verbose output
+## test-short: run all tests
 test-short:
 	go test ./...
 
-## install: install orbit to GOPATH/bin
+## install:    install orbit to GOPATH/bin
 install:
 	go install $(CMD)
 
-## clean: remove build artifacts
+## clean:      remove build artifacts
 clean:
 	rm -f $(BINARY)
 	go clean -cache -testcache
 
-## fmt: format all Go source files
+## fmt:        format all Go source files
 fmt:
 	go fmt ./...
 
-## vet: run go vet on all packages
+## vet:        run go vet on all packages
 vet:
 	go vet ./...
 
-## check: fmt + vet + test (use before committing)
+## check:      fmt + vet + test (run before committing)
 check: fmt vet test
 
-## help: show this help
+## help:       show available targets
 help:
-	@grep -E '^## ' Makefile | sed 's/## //' | column -t -s ':'
+	@echo "Usage: make [target]"
+	@echo ""
+	@grep -E '^## ' Makefile | sed 's/## /  /' | column -t -s ':'
