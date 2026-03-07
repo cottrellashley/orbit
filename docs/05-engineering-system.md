@@ -5,29 +5,58 @@
 The engineering assistant helps Ashley write, review, debug, and manage
 software projects.
 
+## Model
+
+A launcher that opens OpenCode inside individual project directories.
+Type `dev`, enter a developer shell, pick or create a project, and
+OpenCode opens scoped entirely to that project's directory.
+
+`~/Dev/` itself is NOT an OpenCode environment. Each project under
+`~/Dev/active/<name>/` is its own fully self-contained OpenCode
+environment.
+
 ## Working directory
 
+`~/Dev/active/<name>/` (one per project)
+
+## Directory structure
+
+```
 ~/Dev/
+└── active/
+    └── <project-name>/
+        ├── opencode.json          # project-specific OpenCode config (optional)
+        ├── AGENTS.md              # project-specific agent rules (optional)
+        ├── .opencode/             # project-specific commands/skills/agents
+        │   ├── commands/
+        │   ├── skills/
+        │   └── agents/
+        └── <project files>        # source code, configs, etc.
+```
 
-## Current structure
+## Config
 
-- `active/` — active engineering projects and repositories
+Each project's config lives directly in its own directory:
+- `opencode.json` — project-level config (overrides global)
+- `AGENTS.md` — project-specific system prompt and rules
 
-## OpenCode profile
+Shared config (API keys, default model) comes from the global layer
+at `~/.config/opencode/`. See `docs/02-profile-anatomy.md` for details.
 
-~/AI/opencode/profiles/engineer/
+## Project lifecycle
 
-- `opencode.jsonc` — provider, model, agent, and MCP server configuration
-- `AGENTS.md` — agent role description and behavioral instructions
+See `docs/03-project-model.md` for the full lifecycle (create, open,
+archive). Projects are never deleted, only archived.
 
-## Design intent
+## Isolation
 
-- The engineering profile should have access to ~/Dev/ and relevant tool configs
-- Each project lives as its own directory (typically a git repo) under ~/Dev/active/
-- The engineer does not access ~/Executive/ or ~/Vault/
+- Each project is fully isolated from every other project
+- No project can access `~/Executive/` or `~/Vault/`
+- OpenCode loads config only from the project directory + global config
 
 ## Not yet decided
 
-- Whether a project-scaffolding convention is needed
-- What MCP servers or tools the engineering profile should use
-- Whether build/CI tooling config lives here or in ~/AI/opencode/
+- Whether a project-scaffolding convention or template is needed
+- What MCP servers or tools should be available to engineering projects
+- Whether common engineering commands/skills go in global config
+  or are copied per-project
