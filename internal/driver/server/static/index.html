@@ -1,0 +1,1888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orbit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ======================================================================
+   Reset & Custom Properties
+   ====================================================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Surfaces — dark saturated grays, never pure black */
+  --bg:          #0f1117;
+  --bg-raised:   #161921;
+  --bg-surface:  #1c1f2b;
+  --bg-hover:    #242836;
+  --bg-active:   #2a2f40;
+
+  /* Borders — subtle, low contrast */
+  --border:      rgba(255, 255, 255, 0.06);
+  --border-hover:rgba(255, 255, 255, 0.10);
+
+  /* Text */
+  --text:        #e8ecf4;
+  --text-secondary: #9ba3b5;
+  --text-tertiary:  #5f6880;
+
+  /* Accent — single blue, used sparingly */
+  --accent:      #4C8BF5;
+  --accent-soft:  rgba(76, 139, 245, 0.12);
+  --accent-hover: #5E9AFF;
+
+  /* Semantic */
+  --green:       #34D399;
+  --green-soft:  rgba(52, 211, 153, 0.12);
+  --yellow:      #FBBF24;
+  --yellow-soft: rgba(251, 191, 36, 0.12);
+  --red:         #F87171;
+  --red-soft:    rgba(248, 113, 113, 0.12);
+  --orange:      #FB923C;
+  --orange-soft: rgba(251, 146, 60, 0.12);
+
+  /* Typography */
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+
+  /* Spacing */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  32px;
+  --space-2xl: 48px;
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius:    10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  /* Shadows — light from above */
+  --shadow-sm:  0 1px 2px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.15);
+  --shadow:     0 2px 8px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2);
+  --shadow-lg:  0 8px 24px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2);
+  --shadow-xl:  0 16px 48px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.3);
+
+  /* Transitions */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ======================================================================
+   Layout — Sidebar + Main
+   ====================================================================== */
+.app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* --- Sidebar --- */
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: var(--bg-raised);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid var(--border);
+}
+
+.sidebar-header {
+  padding: var(--space-xl) var(--space-lg) var(--space-lg);
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-logo-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--accent);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.sidebar-logo-icon svg {
+  width: 18px;
+  height: 18px;
+  color: #fff;
+}
+
+.sidebar-logo h1 {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text);
+}
+
+.sidebar-logo .version {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  margin-top: 1px;
+}
+
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-sm) var(--space-md);
+}
+
+.nav-group {
+  margin-bottom: var(--space-lg);
+}
+
+.nav-group-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-tertiary);
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-xs);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px var(--space-md);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all 0.15s var(--ease);
+  user-select: none;
+  position: relative;
+}
+
+.nav-item:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.nav-item.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.nav-item .nav-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.nav-item.active .nav-icon {
+  opacity: 1;
+}
+
+.nav-item .nav-badge {
+  margin-left: auto;
+  background: var(--bg-active);
+  color: var(--text-tertiary);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 100px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.nav-item.active .nav-badge {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* --- Main --- */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.main-header {
+  padding: var(--space-lg) var(--space-xl);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 72px;
+  border-bottom: 1px solid var(--border);
+}
+
+.main-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.main-header .subtitle {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-xl);
+}
+
+/* ======================================================================
+   Loading Bar
+   ====================================================================== */
+.loading-bar {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  animation: loading-slide 1.2s ease-in-out infinite;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+@keyframes loading-slide {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ======================================================================
+   Buttons
+   ====================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font);
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  transition: all 0.15s var(--ease);
+  white-space: nowrap;
+}
+
+.btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.btn-danger {
+  color: var(--red);
+}
+
+.btn-danger:hover {
+  background: var(--red-soft);
+  border-color: rgba(248,113,113,0.2);
+  color: var(--red);
+}
+
+.btn-sm {
+  padding: 5px 12px;
+  font-size: 12px;
+}
+
+.btn-icon {
+  padding: 6px 8px;
+}
+
+.btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.btn-group {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+/* ======================================================================
+   Cards
+   ====================================================================== */
+.card {
+  background: var(--bg-raised);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+
+.card-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.card-body {
+  padding: var(--space-lg);
+}
+
+/* ======================================================================
+   Summary Cards (Dashboard feel)
+   ====================================================================== */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.summary-card {
+  background: var(--bg-raised);
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  transition: all 0.2s var(--ease);
+  cursor: pointer;
+}
+
+.summary-card:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+
+.summary-card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.summary-card-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.summary-card-icon.blue   { background: var(--accent-soft); color: var(--accent); }
+.summary-card-icon.green  { background: var(--green-soft); color: var(--green); }
+.summary-card-icon.yellow { background: var(--yellow-soft); color: var(--yellow); }
+.summary-card-icon.red    { background: var(--red-soft); color: var(--red); }
+
+.summary-card-value {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.summary-card-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+}
+
+/* ======================================================================
+   Tables
+   ====================================================================== */
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-tertiary);
+  padding: 12px var(--space-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+td {
+  padding: 14px var(--space-lg);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+tr:last-child td { border-bottom: none; }
+
+tr.clickable {
+  cursor: pointer;
+  transition: background 0.1s var(--ease);
+}
+
+tr.clickable:hover td {
+  background: var(--bg-hover);
+}
+
+/* ======================================================================
+   Status Badges
+   ====================================================================== */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 100px;
+}
+
+.status-badge .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-healthy, .status-pass, .status-idle {
+  background: var(--green-soft);
+  color: var(--green);
+}
+.status-healthy .dot, .status-pass .dot, .status-idle .dot {
+  background: var(--green);
+}
+
+.status-busy {
+  background: var(--yellow-soft);
+  color: var(--yellow);
+}
+.status-busy .dot {
+  background: var(--yellow);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.status-fail, .status-error {
+  background: var(--red-soft);
+  color: var(--red);
+}
+.status-fail .dot, .status-error .dot {
+  background: var(--red);
+}
+
+.status-warn, .status-retry {
+  background: var(--orange-soft);
+  color: var(--orange);
+}
+.status-warn .dot, .status-retry .dot {
+  background: var(--orange);
+}
+
+.status-unknown {
+  background: var(--bg-active);
+  color: var(--text-tertiary);
+}
+.status-unknown .dot {
+  background: var(--text-tertiary);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* ======================================================================
+   Server Cards
+   ====================================================================== */
+.server-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-md);
+}
+
+.server-card {
+  background: var(--bg-raised);
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+  border-left: 3px solid transparent;
+  position: relative;
+}
+
+.server-card:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+
+.server-card.healthy {
+  border-left-color: var(--green);
+}
+
+.server-card.unhealthy {
+  border-left-color: var(--red);
+}
+
+.server-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.server-card-top strong {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.server-card-dir {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: var(--space-md);
+}
+
+.server-card-meta {
+  display: flex;
+  gap: var(--space-lg);
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.server-card-meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ======================================================================
+   Detail Header (back navigation)
+   ====================================================================== */
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.back-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.15s var(--ease);
+  flex-shrink: 0;
+}
+
+.back-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.back-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.detail-info { flex: 1; }
+.detail-info h2 {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.detail-info .meta {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+/* ======================================================================
+   Conversation / Messages
+   ====================================================================== */
+.conversation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  max-width: 860px;
+}
+
+.message {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-radius: var(--radius);
+}
+
+.message-user {
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.message-assistant {
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-sm);
+}
+
+.message-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.message-user .message-avatar {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.message-assistant .message-avatar {
+  background: rgba(168, 130, 255, 0.12);
+  color: #a882ff;
+}
+
+.message-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.message-role {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+}
+
+.message-text {
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text);
+}
+
+.message-text code {
+  background: var(--bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+
+.message-text pre {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  overflow-x: auto;
+  margin: var(--space-sm) 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.message-meta {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.tool-call {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 10px var(--space-md);
+  margin: 6px 0;
+  font-size: 12px;
+}
+
+.tool-call-name {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 12px;
+}
+
+/* ======================================================================
+   Doctor Check Cards
+   ====================================================================== */
+.doctor-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--bg-raised);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.doctor-summary-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.doctor-summary-icon.pass { background: var(--green-soft); color: var(--green); }
+.doctor-summary-icon.fail { background: var(--red-soft); color: var(--red); }
+
+.doctor-summary-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.doctor-summary-text h3 {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.doctor-summary-text p {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+.check-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.check-item {
+  background: var(--bg-raised);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.check-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.check-icon svg {
+  width: 12px;
+  height: 12px;
+}
+
+.check-icon.pass { background: var(--green-soft); color: var(--green); }
+.check-icon.warn { background: var(--yellow-soft); color: var(--yellow); }
+.check-icon.fail { background: var(--red-soft); color: var(--red); }
+
+.check-content { flex: 1; }
+
+.check-content .check-name {
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+.check-content .check-message {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.check-content .check-fix {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+  margin-top: 4px;
+  padding: 6px 10px;
+  background: var(--bg);
+  border-radius: 4px;
+  display: inline-block;
+}
+
+/* ======================================================================
+   Empty States
+   ====================================================================== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px var(--space-xl);
+  color: var(--text-tertiary);
+  text-align: center;
+}
+
+.empty-state-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius);
+  background: var(--bg-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-lg);
+}
+
+.empty-state-icon svg {
+  width: 24px;
+  height: 24px;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-xs);
+}
+
+.empty-state p {
+  font-size: 14px;
+  max-width: 360px;
+  line-height: 1.6;
+}
+
+/* ======================================================================
+   Modal
+   ====================================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  animation: fadeIn 0.15s var(--ease);
+}
+
+.modal {
+  background: var(--bg-raised);
+  border-radius: var(--radius-lg);
+  width: 480px;
+  max-width: 90vw;
+  box-shadow: var(--shadow-xl);
+  animation: modalIn 0.2s var(--ease);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.modal-body {
+  padding: var(--space-lg);
+}
+
+.modal-footer {
+  padding: var(--space-md) var(--space-lg);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+}
+
+.form-group {
+  margin-bottom: var(--space-md);
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 14px;
+  font-family: var(--font);
+  transition: border-color 0.15s var(--ease);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* ======================================================================
+   Spinner
+   ====================================================================== */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--bg-active);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ======================================================================
+   Scrollbar
+   ====================================================================== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--bg-active);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+/* ======================================================================
+   Utility
+   ====================================================================== */
+.mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.text-muted { color: var(--text-secondary); }
+.text-dim   { color: var(--text-tertiary); }
+.text-sm    { font-size: 12px; }
+
+.mt-sm { margin-top: var(--space-sm); }
+.mt-md { margin-top: var(--space-md); }
+.mt-lg { margin-top: var(--space-lg); }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+        </div>
+        <div>
+          <h1>Orbit</h1>
+          <div class="version">AI Environment Manager</div>
+        </div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-label">Overview</div>
+        <div class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-page="servers" onclick="navigate('servers')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><circle cx="6" cy="6" r="1"/><circle cx="6" cy="18" r="1"/></svg>
+          <span>Servers</span>
+          <span class="nav-badge" id="server-count">-</span>
+        </div>
+        <div class="nav-item" data-page="sessions" onclick="navigate('sessions')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Sessions</span>
+          <span class="nav-badge" id="session-count">-</span>
+        </div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Manage</div>
+        <div class="nav-item" data-page="environments" onclick="navigate('environments')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          <span>Environments</span>
+          <span class="nav-badge" id="env-count">-</span>
+        </div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">System</div>
+        <div class="nav-item" data-page="doctor" onclick="navigate('doctor')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          <span>Doctor</span>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div id="loading-bar" class="loading-bar" style="display:none"></div>
+    <div class="main-header">
+      <div>
+        <h2 id="page-title">Dashboard</h2>
+        <div class="subtitle" id="page-subtitle"></div>
+      </div>
+      <div id="header-actions"></div>
+    </div>
+    <div class="main-content" id="page-content"></div>
+  </div>
+</div>
+
+<!-- Modal container -->
+<div id="modal-root"></div>
+
+<script>
+/* ========================================================================
+   SVG Icon Library
+   ======================================================================== */
+const icons = {
+  refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+  arrowLeft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+  alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+  server: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><circle cx="6" cy="6" r="1"/><circle cx="6" cy="18" r="1"/></svg>',
+  message: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+  folder: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>',
+  activity: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
+  close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+};
+
+/* ========================================================================
+   State
+   ======================================================================== */
+const state = {
+  page: 'dashboard',
+  servers: [],
+  sessions: [],
+  environments: [],
+  doctor: null,
+  selectedSession: null,
+  selectedServer: null,
+  sessionMessages: [],
+  loading: false,
+};
+
+/* ========================================================================
+   API
+   ======================================================================== */
+async function api(path, opts = {}) {
+  const resp = await fetch(path, {
+    headers: { 'Content-Type': 'application/json', ...opts.headers },
+    ...opts,
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({ error: resp.statusText }));
+    throw new Error(err.error || resp.statusText);
+  }
+  return resp.json();
+}
+
+async function proxyGet(port, path) {
+  return api(`/api/proxy/${port}${path}`);
+}
+
+/* ========================================================================
+   Data Fetching
+   ======================================================================== */
+async function fetchServers() {
+  try {
+    state.servers = await api('/api/servers');
+    if (!state.servers) state.servers = [];
+  } catch (e) {
+    state.servers = [];
+    console.error('fetch servers:', e);
+  }
+  updateBadge('server-count', state.servers.length);
+}
+
+async function fetchSessions() {
+  try {
+    state.sessions = await api('/api/sessions');
+    if (!state.sessions) state.sessions = [];
+  } catch (e) {
+    state.sessions = [];
+    console.error('fetch sessions:', e);
+  }
+  updateBadge('session-count', state.sessions.length);
+}
+
+async function fetchEnvironments() {
+  try {
+    state.environments = await api('/api/environments');
+    if (!state.environments) state.environments = [];
+  } catch (e) {
+    state.environments = [];
+    console.error('fetch environments:', e);
+  }
+  updateBadge('env-count', state.environments.length);
+}
+
+async function fetchDoctor() {
+  try {
+    state.doctor = await api('/api/doctor');
+  } catch (e) {
+    state.doctor = null;
+    console.error('fetch doctor:', e);
+  }
+}
+
+async function fetchSessionMessages(port, sessionID) {
+  try {
+    const msgs = await proxyGet(port, `/session/${sessionID}/message`);
+    return msgs || [];
+  } catch (e) {
+    console.error('fetch messages:', e);
+    return [];
+  }
+}
+
+async function fetchSessionStatus(port) {
+  try {
+    return await proxyGet(port, '/session/status');
+  } catch (e) {
+    return {};
+  }
+}
+
+function updateBadge(id, count) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = count;
+}
+
+/* ========================================================================
+   Navigation
+   ======================================================================== */
+function navigate(page, opts = {}) {
+  state.page = page;
+  state.selectedSession = opts.session || null;
+  state.selectedServer = opts.server || null;
+  state.sessionMessages = [];
+
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.page === page);
+  });
+
+  render();
+}
+
+/* ========================================================================
+   Render Router
+   ======================================================================== */
+function render() {
+  const content = document.getElementById('page-content');
+  const title = document.getElementById('page-title');
+  const subtitle = document.getElementById('page-subtitle');
+  const actions = document.getElementById('header-actions');
+  actions.innerHTML = '';
+  subtitle.textContent = '';
+
+  switch (state.page) {
+    case 'dashboard':
+      title.textContent = 'Dashboard';
+      subtitle.textContent = 'Overview of your AI environments';
+      actions.innerHTML = `<button class="btn btn-sm" onclick="refreshAll()">${icons.refresh} Refresh</button>`;
+      renderDashboard(content);
+      break;
+    case 'servers':
+      title.textContent = 'Servers';
+      subtitle.textContent = state.servers.length + ' discovered';
+      actions.innerHTML = `<button class="btn btn-sm" onclick="refreshAll()">${icons.refresh} Refresh</button>`;
+      renderServers(content);
+      break;
+    case 'sessions':
+      title.textContent = 'Sessions';
+      subtitle.textContent = state.sessions.length + ' total';
+      actions.innerHTML = `<button class="btn btn-sm" onclick="refreshAll()">${icons.refresh} Refresh</button>`;
+      renderSessions(content);
+      break;
+    case 'session-detail':
+      title.textContent = 'Session';
+      renderSessionDetail(content);
+      break;
+    case 'server-detail':
+      title.textContent = 'Server';
+      renderServerDetail(content);
+      break;
+    case 'environments':
+      title.textContent = 'Environments';
+      subtitle.textContent = state.environments.length + ' registered';
+      actions.innerHTML = `<button class="btn btn-primary btn-sm" onclick="showAddEnvModal()">${icons.plus} Add Environment</button>`;
+      renderEnvironments(content);
+      break;
+    case 'doctor':
+      title.textContent = 'Doctor';
+      subtitle.textContent = 'System diagnostics';
+      actions.innerHTML = `<button class="btn btn-sm" onclick="runDoctor()">${icons.activity} Run Checks</button>`;
+      renderDoctor(content);
+      break;
+  }
+}
+
+/* ========================================================================
+   Page: Dashboard
+   ======================================================================== */
+function renderDashboard(el) {
+  const healthyCount = state.servers.filter(s => s.healthy).length;
+  const busyCount = state.sessions.filter(s => s.status === 'busy').length;
+
+  el.innerHTML = `
+    <div class="summary-grid">
+      <div class="summary-card" onclick="navigate('servers')">
+        <div class="summary-card-icon blue">${icons.server}</div>
+        <div class="summary-card-value">${state.servers.length}</div>
+        <div class="summary-card-label">${state.servers.length === 1 ? 'Server' : 'Servers'} discovered${healthyCount > 0 ? ` &middot; ${healthyCount} healthy` : ''}</div>
+      </div>
+      <div class="summary-card" onclick="navigate('sessions')">
+        <div class="summary-card-icon green">${icons.message}</div>
+        <div class="summary-card-value">${state.sessions.length}</div>
+        <div class="summary-card-label">${state.sessions.length === 1 ? 'Session' : 'Sessions'}${busyCount > 0 ? ` &middot; ${busyCount} active` : ''}</div>
+      </div>
+      <div class="summary-card" onclick="navigate('environments')">
+        <div class="summary-card-icon yellow">${icons.folder}</div>
+        <div class="summary-card-value">${state.environments.length}</div>
+        <div class="summary-card-label">${state.environments.length === 1 ? 'Environment' : 'Environments'} registered</div>
+      </div>
+      <div class="summary-card" onclick="navigate('doctor')">
+        <div class="summary-card-icon ${state.doctor && !state.doctor.ok ? 'red' : 'blue'}">${icons.activity}</div>
+        <div class="summary-card-value">${state.doctor ? (state.doctor.ok ? 'OK' : '!') : '--'}</div>
+        <div class="summary-card-label">System health</div>
+      </div>
+    </div>
+
+    ${state.servers.length > 0 ? `
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:var(--space-md);color:var(--text-secondary)">Active Servers</h3>
+      <div class="server-grid" style="margin-bottom:var(--space-xl)">
+        ${state.servers.slice(0, 4).map(s => renderServerCardHTML(s)).join('')}
+      </div>
+    ` : ''}
+
+    ${state.sessions.length > 0 ? `
+      <h3 style="font-size:14px;font-weight:600;margin-bottom:var(--space-md);color:var(--text-secondary)">Recent Sessions</h3>
+      <div class="card">
+        <div class="table-wrap"><table>
+          <thead><tr><th>Title</th><th>Environment</th><th>Status</th><th>Created</th></tr></thead>
+          <tbody>${state.sessions.slice(0, 5).map(s => `
+            <tr class="clickable" onclick="openSessionConvo(${s.server_port}, '${esc(s.id)}', '${esc(s.title || 'Untitled')}')">
+              <td><strong>${esc(s.title || 'Untitled')}</strong><br><span class="mono text-dim">${esc((s.id || '').substring(0, 8))}</span></td>
+              <td>${s.environment_name ? esc(s.environment_name) : '<span class="text-dim">--</span>'}</td>
+              <td>${statusBadge(s.status || 'unknown')}</td>
+              <td class="text-sm text-dim">${formatTime(s.created_at)}</td>
+            </tr>
+          `).join('')}</tbody>
+        </table></div>
+      </div>
+    ` : ''}
+  `;
+}
+
+/* ========================================================================
+   Page: Servers
+   ======================================================================== */
+function renderServerCardHTML(s) {
+  return `
+    <div class="server-card ${s.healthy ? 'healthy' : 'unhealthy'}" onclick="openServerDetail(${s.port})">
+      <div class="server-card-top">
+        <strong>PID ${s.pid}</strong>
+        ${statusBadge(s.healthy ? 'healthy' : 'unknown')}
+      </div>
+      <div class="server-card-dir" title="${esc(s.directory)}">${esc(s.directory || 'unknown')}</div>
+      <div class="server-card-meta">
+        <span>Port ${s.port}</span>
+        <span>${esc(s.hostname || '127.0.0.1')}</span>
+        ${s.version ? `<span>v${esc(s.version)}</span>` : ''}
+      </div>
+    </div>`;
+}
+
+function renderServers(el) {
+  if (state.servers.length === 0) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">${icons.server}</div>
+        <h3>No servers discovered</h3>
+        <p>Start an OpenCode server and it will appear here automatically.</p>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = `<div class="server-grid">${state.servers.map(s => renderServerCardHTML(s)).join('')}</div>`;
+}
+
+async function openServerDetail(port) {
+  const server = state.servers.find(s => s.port === port);
+  if (!server) return;
+  navigate('server-detail', { server });
+}
+
+/* ========================================================================
+   Page: Server Detail
+   ======================================================================== */
+async function renderServerDetail(el) {
+  const s = state.selectedServer;
+  if (!s) { navigate('servers'); return; }
+
+  el.innerHTML = `
+    <div class="detail-header">
+      <span class="back-btn" onclick="navigate('servers')">${icons.arrowLeft}</span>
+      <div class="detail-info">
+        <h2>Server on port ${s.port}</h2>
+        <div class="meta">${esc(s.directory || 'unknown')} &middot; PID ${s.pid}</div>
+      </div>
+      ${statusBadge(s.healthy ? 'healthy' : 'unknown')}
+    </div>
+    <div id="server-sessions-area">
+      <div style="padding:var(--space-xl);color:var(--text-tertiary)"><span class="spinner"></span> Loading sessions...</div>
+    </div>`;
+
+  try {
+    const [sessions, statuses] = await Promise.all([
+      proxyGet(s.port, '/session'),
+      fetchSessionStatus(s.port),
+    ]);
+    renderServerSessions(document.getElementById('server-sessions-area'), sessions || [], statuses || {}, s.port);
+  } catch (e) {
+    document.getElementById('server-sessions-area').innerHTML =
+      `<div class="empty-state"><p>Could not load sessions: ${esc(e.message)}</p></div>`;
+  }
+}
+
+function renderServerSessions(el, sessions, statuses, port) {
+  if (sessions.length === 0) {
+    el.innerHTML = `<div class="empty-state"><h3>No sessions</h3><p>This server has no sessions yet.</p></div>`;
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="card">
+      <div class="card-header"><h3>Sessions (${sessions.length})</h3></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Title</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+        <tbody>${sessions.map(s => {
+          const st = statuses[s.id] || { type: 'unknown' };
+          return `<tr class="clickable" onclick="openSessionConvo(${port}, '${esc(s.id)}', '${esc(s.title || 'Untitled')}')">
+            <td><strong>${esc(s.title || 'Untitled')}</strong><br><span class="mono text-dim">${esc(s.id.substring(0, 8))}</span></td>
+            <td>${statusBadge(st.type)}</td>
+            <td class="text-sm text-dim">${formatTime(s.time?.created)}</td>
+            <td><button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteSessionDirect(${port}, '${esc(s.id)}')">Delete</button></td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table></div>
+    </div>`;
+}
+
+/* ========================================================================
+   Page: Sessions
+   ======================================================================== */
+function renderSessions(el) {
+  if (state.sessions.length === 0) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">${icons.message}</div>
+        <h3>No active sessions</h3>
+        <p>Sessions from discovered OpenCode servers will appear here.</p>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="card">
+      <div class="table-wrap"><table>
+        <thead><tr><th>Title</th><th>Environment</th><th>Server</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+        <tbody>${state.sessions.map(s => `
+          <tr class="clickable" onclick="openSessionConvo(${s.server_port}, '${esc(s.id)}', '${esc(s.title || 'Untitled')}')">
+            <td><strong>${esc(s.title || 'Untitled')}</strong><br><span class="mono text-dim">${esc((s.id || '').substring(0, 8))}</span></td>
+            <td>${s.environment_name ? esc(s.environment_name) : '<span class="text-dim">--</span>'}</td>
+            <td class="mono text-sm">:${s.server_port}</td>
+            <td>${statusBadge(s.status || 'unknown')}</td>
+            <td class="text-sm text-dim">${formatTime(s.created_at)}</td>
+            <td>
+              <div class="btn-group">
+                ${s.status === 'busy' ? `<button class="btn btn-sm" onclick="event.stopPropagation(); abortSession('${esc(s.id)}')">Abort</button>` : ''}
+                <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteSession('${esc(s.id)}')">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `).join('')}</tbody>
+      </table></div>
+    </div>`;
+}
+
+/* ========================================================================
+   Session Detail / Conversation
+   ======================================================================== */
+async function openSessionConvo(port, sessionID, title) {
+  state.page = 'session-detail';
+  state.selectedSession = { port, sessionID, title };
+  state.sessionMessages = [];
+  render();
+
+  const msgsArea = document.getElementById('messages-area');
+  if (!msgsArea) return;
+
+  msgsArea.innerHTML = `<div style="padding:var(--space-xl);color:var(--text-tertiary)"><span class="spinner"></span> Loading conversation...</div>`;
+
+  const messages = await fetchSessionMessages(port, sessionID);
+  state.sessionMessages = messages;
+  renderMessages(msgsArea, messages);
+}
+
+function renderSessionDetail(el) {
+  const s = state.selectedSession;
+  if (!s) { navigate('sessions'); return; }
+
+  el.innerHTML = `
+    <div class="detail-header">
+      <span class="back-btn" onclick="navigate('sessions')">${icons.arrowLeft}</span>
+      <div class="detail-info">
+        <h2>${esc(s.title)}</h2>
+        <div class="meta">Port ${s.port} &middot; ${esc(s.sessionID.substring(0, 12))}</div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-sm" onclick="openSessionConvo(${s.port}, '${esc(s.sessionID)}', '${esc(s.title)}')">${icons.refresh} Reload</button>
+      </div>
+    </div>
+    <div id="messages-area"></div>`;
+}
+
+function renderMessages(el, messages) {
+  if (!messages || messages.length === 0) {
+    el.innerHTML = `<div class="empty-state"><h3>No messages</h3><p>This session has no messages yet.</p></div>`;
+    return;
+  }
+
+  let html = '<div class="conversation">';
+  for (const msg of messages) {
+    const info = msg.info;
+    const parts = msg.parts || [];
+
+    let role = 'unknown';
+    let roleLabel = 'Message';
+    try {
+      const parsed = typeof info === 'string' ? JSON.parse(info) : info;
+      role = parsed.role || 'unknown';
+    } catch (e) {}
+
+    if (role === 'user') roleLabel = 'You';
+    else if (role === 'assistant') roleLabel = 'Assistant';
+
+    const textParts = [];
+    const toolParts = [];
+    for (const p of parts) {
+      if (p.type === 'text' && p.text) textParts.push(p.text);
+      else if (p.type === 'tool-invocation' || p.type === 'tool-result' || p.tool) toolParts.push(p);
+      else if (p.text) textParts.push(p.text);
+    }
+
+    const isUser = role === 'user';
+    html += `
+      <div class="message message-${isUser ? 'user' : 'assistant'}">
+        <div class="message-avatar">${isUser ? 'U' : 'A'}</div>
+        <div class="message-body">
+          <div class="message-role">${esc(roleLabel)}</div>
+          ${textParts.length > 0 ? `<div class="message-text">${formatMessageText(textParts.join('\n'))}</div>` : ''}
+          ${toolParts.map(t => `
+            <div class="tool-call">
+              <span class="tool-call-name">${esc(t.tool || t.type || 'tool')}</span>
+              ${t.text ? `<div class="message-text" style="margin-top:6px;font-size:12px">${formatMessageText(t.text.substring(0, 500))}${t.text.length > 500 ? '...' : ''}</div>` : ''}
+            </div>
+          `).join('')}
+          ${renderMessageMeta(msg)}
+        </div>
+      </div>`;
+  }
+  html += '</div>';
+  el.innerHTML = html;
+  el.scrollTop = el.scrollHeight;
+}
+
+function renderMessageMeta(msg) {
+  const info = typeof msg.info === 'string' ? JSON.parse(msg.info) : msg.info;
+  if (!info) return '';
+
+  const parts = [];
+  if (info.tokens) {
+    const t = info.tokens;
+    if (t.input) parts.push(`In: ${t.input}`);
+    if (t.output) parts.push(`Out: ${t.output}`);
+  }
+  if (info.cost && info.cost > 0) parts.push(`$${info.cost.toFixed(4)}`);
+  if (info.modelID) parts.push(info.modelID);
+
+  if (parts.length === 0) return '';
+  return `<div class="message-meta">${parts.map(p => `<span>${esc(p)}</span>`).join('')}</div>`;
+}
+
+/* ========================================================================
+   Page: Environments
+   ======================================================================== */
+function renderEnvironments(el) {
+  if (state.environments.length === 0) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">${icons.folder}</div>
+        <h3>No environments registered</h3>
+        <p>Register a project directory to start managing it with Orbit.</p>
+        <button class="btn btn-primary mt-lg" onclick="showAddEnvModal()">${icons.plus} Add Environment</button>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="card">
+      <div class="table-wrap"><table>
+        <thead><tr><th>Name</th><th>Path</th><th>Profile</th><th>Created</th><th>Actions</th></tr></thead>
+        <tbody>${state.environments.map(e => `
+          <tr>
+            <td><strong>${esc(e.name)}</strong></td>
+            <td class="mono text-muted">${esc(e.path)}</td>
+            <td>${e.profile_name ? esc(e.profile_name) : '<span class="text-dim">--</span>'}</td>
+            <td class="text-sm text-dim">${formatTime(e.created_at)}</td>
+            <td><button class="btn btn-sm btn-danger" onclick="deleteEnv('${esc(e.name)}')">Delete</button></td>
+          </tr>
+        `).join('')}</tbody>
+      </table></div>
+    </div>`;
+}
+
+/* ========================================================================
+   Page: Doctor
+   ======================================================================== */
+function renderDoctor(el) {
+  if (!state.doctor) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">${icons.activity}</div>
+        <h3>Run diagnostics</h3>
+        <p>Check your Orbit setup for common issues and misconfigurations.</p>
+        <button class="btn btn-primary mt-lg" onclick="runDoctor()">${icons.activity} Run Checks</button>
+      </div>`;
+    return;
+  }
+
+  const d = state.doctor;
+  const passCount = (d.results || []).filter(r => r.status === 'pass').length;
+  const totalCount = (d.results || []).length;
+
+  el.innerHTML = `
+    <div class="doctor-summary">
+      <div class="doctor-summary-icon ${d.ok ? 'pass' : 'fail'}">
+        ${d.ok ? icons.check : icons.alert}
+      </div>
+      <div class="doctor-summary-text">
+        <h3>${d.ok ? 'All checks passed' : 'Some checks need attention'}</h3>
+        <p>${passCount} of ${totalCount} checks passed</p>
+      </div>
+    </div>
+    <div class="check-list">
+      ${(d.results || []).map(r => `
+        <div class="check-item">
+          <div class="check-icon ${r.status}">
+            ${r.status === 'pass' ? icons.check : r.status === 'warn' ? icons.alert : icons.x}
+          </div>
+          <div class="check-content">
+            <div class="check-name">${esc(r.name)}</div>
+            <div class="check-message">${esc(r.message)}</div>
+            ${r.fix ? `<div class="check-fix">${esc(r.fix)}</div>` : ''}
+          </div>
+        </div>
+      `).join('')}
+    </div>`;
+}
+
+/* ========================================================================
+   Actions
+   ======================================================================== */
+async function refreshAll() {
+  showLoading(true);
+  await Promise.all([fetchServers(), fetchSessions(), fetchEnvironments()]);
+  showLoading(false);
+  render();
+}
+
+async function runDoctor() {
+  showLoading(true);
+  await fetchDoctor();
+  showLoading(false);
+  render();
+}
+
+async function abortSession(id) {
+  if (!confirm('Abort this session?')) return;
+  try {
+    await api(`/api/sessions/${id}/abort`, { method: 'POST' });
+    await fetchSessions();
+    render();
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+async function deleteSession(id) {
+  if (!confirm('Delete this session? This cannot be undone.')) return;
+  try {
+    await api(`/api/sessions/${id}`, { method: 'DELETE' });
+    await fetchSessions();
+    render();
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+async function deleteSessionDirect(port, id) {
+  if (!confirm('Delete this session? This cannot be undone.')) return;
+  try {
+    await proxyGet(port, `/session/${id}`);
+    await fetch(`/api/proxy/${port}/session/${id}`, { method: 'DELETE' });
+    if (state.selectedServer) {
+      renderServerDetail(document.getElementById('page-content'));
+    }
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+async function deleteEnv(name) {
+  if (!confirm(`Delete environment "${name}"? This only removes it from Orbit's registry.`)) return;
+  try {
+    await api(`/api/environments/${encodeURIComponent(name)}`, { method: 'DELETE' });
+    await fetchEnvironments();
+    render();
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+/* ========================================================================
+   Modal: Add Environment
+   ======================================================================== */
+function showAddEnvModal() {
+  const root = document.getElementById('modal-root');
+  root.innerHTML = `
+    <div class="modal-overlay" onclick="closeModal(event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Add Environment</h3>
+          <button class="btn btn-icon btn-sm" onclick="closeModal()">${icons.close}</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" id="env-name" placeholder="my-project" autofocus>
+          </div>
+          <div class="form-group">
+            <label>Path</label>
+            <input type="text" id="env-path" placeholder="/path/to/project">
+          </div>
+          <div class="form-group">
+            <label>Description (optional)</label>
+            <input type="text" id="env-desc" placeholder="A brief description">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-sm" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary btn-sm" onclick="submitAddEnv()">Add Environment</button>
+        </div>
+      </div>
+    </div>`;
+
+  // Focus the first input after animation
+  setTimeout(() => document.getElementById('env-name')?.focus(), 100);
+}
+
+async function submitAddEnv() {
+  const name = document.getElementById('env-name').value.trim();
+  const path = document.getElementById('env-path').value.trim();
+  const desc = document.getElementById('env-desc').value.trim();
+
+  if (!name || !path) {
+    alert('Name and path are required');
+    return;
+  }
+
+  try {
+    await api('/api/environments', {
+      method: 'POST',
+      body: JSON.stringify({ name, path, description: desc }),
+    });
+    closeModal();
+    await fetchEnvironments();
+    render();
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+function closeModal(event) {
+  if (event && event.target !== event.currentTarget) return;
+  document.getElementById('modal-root').innerHTML = '';
+}
+
+/* ========================================================================
+   Helpers
+   ======================================================================== */
+function esc(str) {
+  if (str == null) return '';
+  const d = document.createElement('div');
+  d.textContent = String(str);
+  return d.innerHTML;
+}
+
+function statusBadge(status) {
+  const label = status || 'unknown';
+  return `<span class="status-badge status-${label}"><span class="dot"></span>${label}</span>`;
+}
+
+function formatTime(t) {
+  if (!t) return '--';
+  let d;
+  if (typeof t === 'number') {
+    d = new Date(t > 1e12 ? t : t * 1000);
+  } else {
+    d = new Date(t);
+  }
+  if (isNaN(d.getTime())) return '--';
+
+  const now = new Date();
+  const diff = now - d;
+
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+  return d.toLocaleDateString();
+}
+
+function formatMessageText(text) {
+  if (!text) return '';
+  let safe = esc(text);
+  safe = safe.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+  safe = safe.replace(/`([^`]+)`/g, '<code>$1</code>');
+  safe = safe.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  return safe;
+}
+
+function showLoading(on) {
+  document.getElementById('loading-bar').style.display = on ? 'block' : 'none';
+}
+
+/* ========================================================================
+   Init
+   ======================================================================== */
+async function init() {
+  showLoading(true);
+  await Promise.all([fetchServers(), fetchSessions(), fetchEnvironments()]);
+  showLoading(false);
+  render();
+
+  // Auto-refresh every 10s for live views
+  setInterval(async () => {
+    if (['dashboard', 'servers', 'sessions'].includes(state.page)) {
+      await Promise.all([fetchServers(), fetchSessions()]);
+      if (['dashboard', 'servers', 'sessions'].includes(state.page)) {
+        render();
+      }
+    }
+  }, 10000);
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+  if ((e.metaKey || e.ctrlKey) && e.key === 'r') {
+    e.preventDefault();
+    refreshAll();
+  }
+});
+
+init();
+</script>
+</body>
+</html>
