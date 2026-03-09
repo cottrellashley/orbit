@@ -187,3 +187,97 @@ Since Orbit is a manager/control plane, heavy emphasis on **jumping out**:
 - Jump into issues, PRs, etc.
 
 Orbit doesn't replicate these UIs — it links to them and launches them.
+
+---
+
+## 9. Markdown Rendering Engine (from OpenDoc)
+
+Take the markdown rendering engine from **OpenDoc** (`cottrellashley/opendoc`)
+— our own static site generator with integrated workbench and terminal — and
+use it as Orbit's built-in markdown renderer. Many things in Orbit are really
+just markdown files on disk — they should render beautifully in the UI when
+a user clicks on them.
+
+### What gets rendered
+
+- **Agent Plans**: The set of markdown files an agent uses to plan, track
+  findings, and maintain state. When a user clicks on an agent's plan, they
+  see the rendered markdown — not raw text.
+- **Skills**: When browsing/editing profiles, the skills (which are markdown
+  definitions on disk) render nicely in-place.
+- **Any markdown-based config**: READMEs, project docs, profile descriptions,
+  slash command help text — anything stored as `.md` gets first-class
+  rendering.
+
+### How it works
+
+- Reuse OpenDoc's rendering engine (don't reinvent)
+- Render inline in the Orbit UI — clicking a component that is backed by a
+  markdown file opens a rendered view, not a raw file dump
+- Support code blocks with syntax highlighting, tables, headings, lists,
+  links — the full CommonMark spec plus whatever OpenDoc already supports
+- Read-only rendering in the browser; editing happens via the Orbit
+  Assistant or external editor
+
+---
+
+## 10. Orbit Config Directory — Managed Workspace
+
+A dedicated, closed directory specifically for Orbit's own configuration
+and state. This is the user's space for managing their entire setup,
+and the Orbit Assistant operates within it.
+
+### Structure (something like `~/.config/orbit/` or `~/.orbit/`)
+
+- `profiles/` — profile definitions (markdown + config)
+- `skills/` — skill definitions (markdown)
+- `agents/` — agent configurations
+- `plans/` — agent plans, findings, tracking state (markdown)
+- `mcp/` — MCP server configurations
+- `commands/` — custom slash command definitions
+- `state/` — runtime state (servers.json, session cache, etc.)
+
+### Key properties
+
+- **Browsable in the UI**: The Orbit web UI and TUI can navigate this
+  directory structure, rendering markdown files inline (see section 9)
+- **Orbit Assistant has full access**: The personalised Orbit agent can
+  read, write, and organise files in this directory — helping users
+  manage their setup through conversation
+- **Self-contained**: Everything Orbit needs to know about the user's
+  configuration lives here. Portable, backupable, version-controllable.
+- **Not project data**: This is Orbit's own config space, separate from
+  the user's project directories. Projects reference profiles from here,
+  but the project code lives elsewhere.
+
+---
+
+## 11. UI Inspiration — Study OpenClaw
+
+Take inspiration from **OpenClaw** (openclaw/openclaw) for UI/UX decisions —
+specifically tab groupings, naming conventions, navigation structure, and
+information hierarchy. NOT the implementation.
+
+### Why OpenClaw
+
+- Large established userbase — the UX has been battle-tested and iterated
+- Reasonable to assume their tab groupings, naming, and navigation patterns
+  reflect good user experience intuition loops
+- Users coming from OpenClaw will find familiar patterns (Jakob's Law)
+
+### What to study
+
+- How they group features into tabs/sections
+- What they name things (labels, menu items, section headers)
+- Navigation flow — how users move between views
+- Information density — what they show at a glance vs behind a click
+- Empty states, onboarding, first-run experience
+
+### What NOT to take
+
+- Implementation details — we have our own architecture
+- Visual design — we have our own design system (see UI redesign)
+- Technology choices — Orbit is Go + single HTML, not whatever OpenClaw uses
+
+Study the UX patterns, apply them where they make sense for Orbit's
+management-focused use case.
