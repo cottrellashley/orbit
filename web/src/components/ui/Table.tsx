@@ -2,14 +2,14 @@ import type { ReactNode, TdHTMLAttributes, ThHTMLAttributes } from 'react'
 
 export function Table({ children }: { children: ReactNode }) {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto rounded-lg border border-border-subtle">
       <table className="w-full border-collapse">{children}</table>
     </div>
   )
 }
 
 export function THead({ children }: { children: ReactNode }) {
-  return <thead>{children}</thead>
+  return <thead className="bg-bg-raised">{children}</thead>
 }
 
 export function TBody({ children }: { children: ReactNode }) {
@@ -27,8 +27,8 @@ export function TRow({ children, clickable, onClick, className = '' }: TRowProps
   return (
     <tr
       className={`
-        border-b border-border/50 last:border-b-0 transition-colors duration-fast
-        ${clickable ? 'cursor-pointer hover:bg-white/[0.02]' : ''}
+        border-b border-border-subtle last:border-b-0 transition-colors duration-fast
+        ${clickable ? 'cursor-pointer hover:bg-bg-hover' : ''}
         ${className}
       `}
       onClick={onClick}
@@ -43,9 +43,9 @@ export function TH({ children, className = '', ...props }: ThHTMLAttributes<HTML
     <th
       className={`
         text-left text-caption-xs uppercase tracking-[0.06em]
-        text-txt-quaternary font-normal
-        px-3 py-1.5
-        border-b border-border/50
+        text-txt-tertiary font-medium
+        px-3 py-2
+        border-b border-border
         ${className}
       `}
       {...props}
@@ -57,7 +57,7 @@ export function TH({ children, className = '', ...props }: ThHTMLAttributes<HTML
 
 export function TD({ children, className = '', ...props }: TdHTMLAttributes<HTMLTableCellElement> & { children?: ReactNode }) {
   return (
-    <td className={`px-3 py-2 text-caption ${className}`} {...props}>
+    <td className={`px-3 py-2.5 text-caption ${className}`} {...props}>
       {children}
     </td>
   )

@@ -33,18 +33,18 @@
 
   /* Scrollbar — minimal, dark */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
   ::-webkit-scrollbar-track {
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.08);
     border-radius: 6px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.14);
   }
 
   /* Focus ring utility */
@@ -63,7 +63,7 @@
 @layer components {
   /* Form input base */
   .input-base {
-    @apply w-full bg-bg-surface border border-border rounded-lg px-3 py-2 text-body text-txt;
+    @apply w-full bg-bg-surface border border-border rounded px-3 py-2 text-body text-txt;
     @apply placeholder:text-txt-quaternary;
     @apply focus:outline-none focus:border-accent/40 focus:shadow-focus;
     @apply transition-all duration-fast;
@@ -71,5 +71,10 @@
 
   .input-base:hover:not(:focus) {
     @apply border-border-hover;
+  }
+
+  /* Section container — subtle bg for grouping */
+  .section-container {
+    @apply bg-bg-raised border border-border-subtle rounded-lg;
   }
 }

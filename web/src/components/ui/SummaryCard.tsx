@@ -1,10 +1,8 @@
 import type { ReactNode } from 'react'
 
-type IconColor = 'accent' | 'green' | 'yellow' | 'red' | 'blue'
-
 interface SummaryCardProps {
   icon?: ReactNode
-  iconColor?: IconColor
+  iconColor?: 'accent' | 'green' | 'yellow' | 'red' | 'blue'
   value: number | string
   label: string
   onClick?: () => void
@@ -13,17 +11,21 @@ interface SummaryCardProps {
 export function SummaryCard({ value, label, onClick }: SummaryCardProps) {
   return (
     <div
-      className={`${onClick ? 'cursor-pointer hover:bg-white/[0.02]' : ''} transition-colors duration-fast px-3 py-2 rounded`}
+      className={`
+        bg-bg-raised border border-border-subtle rounded-lg px-4 py-3
+        transition-colors duration-fast
+        ${onClick ? 'cursor-pointer hover:border-border-hover hover:bg-bg-hover' : ''}
+      `}
       onClick={onClick}
     >
-      <div className="text-label text-txt tabular-nums">{value}</div>
-      <div className="text-caption-xs text-txt-quaternary mt-0.5">{label}</div>
+      <div className="text-heading-lg text-txt tabular-nums">{value}</div>
+      <div className="text-caption-xs text-txt-tertiary mt-0.5">{label}</div>
     </div>
   )
 }
 
 export function SummaryGrid({ children }: { children: ReactNode }) {
   return (
-    <div className="flex gap-1 mb-4">{children}</div>
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">{children}</div>
   )
 }

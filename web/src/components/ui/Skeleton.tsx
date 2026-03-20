@@ -20,7 +20,7 @@ export function SkeletonRow() {
 
 export function SkeletonCard() {
   return (
-    <div className="bg-bg-raised border border-border rounded-xl p-4">
+    <div className="bg-bg-raised border border-border-subtle rounded-lg p-4">
       <div className="flex items-center gap-3 mb-3">
         <Skeleton width="36px" height="36px" className="rounded-lg" />
         <div>

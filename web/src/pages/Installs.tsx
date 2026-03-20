@@ -38,83 +38,73 @@ export function Installs() {
   return (
     <div className="flex flex-col flex-1 min-h-0">
       <MainHeader title="Installs" />
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto px-5 py-4">
         {state.installs.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <div className="text-caption text-txt-tertiary">No tools registered</div>
+            <div className="bg-bg-raised border border-border-subtle rounded-lg px-8 py-8 text-center">
+              <div className="text-label text-txt-secondary">No tools registered</div>
               <div className="text-caption-xs text-txt-quaternary mt-1">
                 Install service is not available.
               </div>
             </div>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-5">
             {error && (
-              <div className="text-caption-xs text-red-400 bg-red-400/10 px-3 py-2">
+              <div className="text-caption-xs text-semantic-red bg-semantic-red-soft border border-semantic-red/20 rounded-lg px-4 py-2.5">
                 {error}
               </div>
             )}
 
             {installed.length > 0 && (
               <section>
-                <div className="text-caption-xs text-txt-quaternary uppercase tracking-wider mb-2">
+                <div className="text-caption-xs text-txt-tertiary uppercase tracking-wider mb-2">
                   Installed
                 </div>
-                <table className="w-full text-caption">
-                  <thead>
-                    <tr className="text-left text-caption-xs text-txt-quaternary">
-                      <th className="pb-1 font-normal">Name</th>
-                      <th className="pb-1 font-normal">Version</th>
-                      <th className="pb-1 font-normal">Description</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {installed.map((t) => (
-                      <tr key={t.name} className="text-txt-secondary">
-                        <td className="py-1 pr-4 text-txt-primary">{t.name}</td>
-                        <td className="py-1 pr-4 text-txt-tertiary font-mono text-caption-xs">
-                          {t.version || '-'}
-                        </td>
-                        <td className="py-1 text-txt-quaternary">{t.description}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <div className="rounded-lg border border-border-subtle overflow-hidden">
+                  {installed.map((t, i) => (
+                    <div
+                      key={t.name}
+                      className={`flex items-center px-4 py-2.5 text-caption ${
+                        i < installed.length - 1 ? 'border-b border-border-subtle' : ''
+                      }`}
+                    >
+                      <span className="text-txt w-[140px] shrink-0">{t.name}</span>
+                      <span className="text-txt-tertiary font-mono text-caption-xs w-[100px] shrink-0">
+                        {t.version || '-'}
+                      </span>
+                      <span className="text-txt-quaternary flex-1 truncate">{t.description}</span>
+                    </div>
+                  ))}
+                </div>
               </section>
             )}
 
             {notInstalled.length > 0 && (
               <section>
-                <div className="text-caption-xs text-txt-quaternary uppercase tracking-wider mb-2">
+                <div className="text-caption-xs text-txt-tertiary uppercase tracking-wider mb-2">
                   Not Installed
                 </div>
-                <table className="w-full text-caption">
-                  <thead>
-                    <tr className="text-left text-caption-xs text-txt-quaternary">
-                      <th className="pb-1 font-normal">Name</th>
-                      <th className="pb-1 font-normal">Description</th>
-                      <th className="pb-1 font-normal text-right">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {notInstalled.map((t) => (
-                      <tr key={t.name} className="text-txt-secondary">
-                        <td className="py-1 pr-4 text-txt-primary">{t.name}</td>
-                        <td className="py-1 pr-4 text-txt-quaternary">{t.description}</td>
-                        <td className="py-1 text-right">
-                          <button
-                            onClick={() => handleInstall(t.name)}
-                            disabled={installing !== null}
-                            className="text-caption-xs text-accent hover:text-accent/80 disabled:text-txt-quaternary disabled:cursor-not-allowed transition-colors"
-                          >
-                            {installing === t.name ? 'Installing...' : 'Install'}
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <div className="rounded-lg border border-border-subtle overflow-hidden">
+                  {notInstalled.map((t, i) => (
+                    <div
+                      key={t.name}
+                      className={`flex items-center px-4 py-2.5 text-caption ${
+                        i < notInstalled.length - 1 ? 'border-b border-border-subtle' : ''
+                      }`}
+                    >
+                      <span className="text-txt w-[140px] shrink-0">{t.name}</span>
+                      <span className="text-txt-quaternary flex-1 truncate">{t.description}</span>
+                      <button
+                        onClick={() => handleInstall(t.name)}
+                        disabled={installing !== null}
+                        className="text-caption-xs text-accent hover:text-accent-hover disabled:text-txt-quaternary disabled:cursor-not-allowed transition-colors shrink-0 ml-3 bg-transparent border-none cursor-pointer"
+                      >
+                        {installing === t.name ? 'Installing...' : 'Install'}
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </section>
             )}
           </div>

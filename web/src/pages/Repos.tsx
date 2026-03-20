@@ -48,9 +48,9 @@ export function Repos() {
           </Button>
         }
       />
-      <div className="flex-1 overflow-y-auto px-4 py-3">
+      <div className="flex-1 overflow-y-auto px-5 py-4">
         {/* Auth status */}
-        <div className="flex items-center gap-2 px-3 py-2 mb-3">
+        <div className="flex items-center gap-2 bg-bg-raised border border-border-subtle rounded-lg px-4 py-2.5 mb-4">
           {loading ? (
             <>
               <Spinner size={12} />
@@ -87,7 +87,7 @@ export function Repos() {
           />
         ) : repos.length > 0 ? (
           <>
-            <div className="text-caption-xs text-txt-quaternary uppercase tracking-[0.06em] px-3 mb-1">
+            <div className="text-caption-xs text-txt-tertiary uppercase tracking-[0.06em] mb-2">
               {repos.length} repositories
             </div>
             <Table>

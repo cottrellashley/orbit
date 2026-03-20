@@ -9,7 +9,7 @@ export function Servers() {
   return (
     <div className="flex flex-col flex-1 min-h-0">
       <MainHeader title="Nodes" />
-      <div className="flex-1 overflow-y-auto px-4 py-3">
+      <div className="flex-1 overflow-y-auto px-5 py-4">
         {state.servers.length === 0 ? (
           <EmptyState
             title="No nodes found"
@@ -17,7 +17,7 @@ export function Servers() {
           />
         ) : (
           <>
-            <div className="text-caption-xs text-txt-quaternary uppercase tracking-[0.06em] px-3 mb-1">
+            <div className="text-caption-xs text-txt-tertiary uppercase tracking-[0.06em] mb-2">
               {state.servers.length} discovered
             </div>
             <ServerGrid>

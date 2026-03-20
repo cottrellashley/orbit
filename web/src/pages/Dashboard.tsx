@@ -13,7 +13,7 @@ export function Dashboard() {
     ? state.doctor.ok
       ? 'Passing'
       : 'Issues'
-    : '—'
+    : '---'
 
   const recentSessions = state.sessions.slice(0, 5)
   const displayServers = state.servers.slice(0, 4)
@@ -21,7 +21,7 @@ export function Dashboard() {
   return (
     <div className="flex flex-col flex-1 min-h-0">
       <MainHeader title="Dashboard" />
-      <div className="flex-1 overflow-y-auto px-4 py-3">
+      <div className="flex-1 overflow-y-auto px-5 py-4">
         {/* Stats */}
         <SummaryGrid>
           <SummaryCard value={state.servers.length} label="Nodes" onClick={() => navigate('nodes')} />
@@ -32,8 +32,8 @@ export function Dashboard() {
 
         {/* Active servers */}
         {displayServers.length > 0 && (
-          <div className="mb-4">
-            <div className="text-caption-xs text-txt-quaternary uppercase tracking-[0.06em] px-3 mb-1">Nodes</div>
+          <section className="mb-5">
+            <div className="text-caption-xs text-txt-tertiary uppercase tracking-[0.06em] mb-2">Nodes</div>
             <ServerGrid>
               {displayServers.map((s) => (
                 <ServerCard
@@ -43,14 +43,14 @@ export function Dashboard() {
                 />
               ))}
             </ServerGrid>
-          </div>
+          </section>
         )}
 
         {/* Recent sessions */}
         {recentSessions.length > 0 && (
-          <div>
-            <div className="flex items-center justify-between px-3 mb-1">
-              <span className="text-caption-xs text-txt-quaternary uppercase tracking-[0.06em]">Recent Sessions</span>
+          <section>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-caption-xs text-txt-tertiary uppercase tracking-[0.06em]">Recent Sessions</span>
               <button
                 onClick={() => navigate('sessions')}
                 className="text-caption-xs text-txt-quaternary hover:text-txt-tertiary transition-colors duration-fast cursor-pointer bg-transparent border-none"
@@ -99,7 +99,7 @@ export function Dashboard() {
                 ))}
               </TBody>
             </Table>
-          </div>
+          </section>
         )}
       </div>
     </div>

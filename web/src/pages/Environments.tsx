@@ -45,12 +45,12 @@ export function Environments() {
       <MainHeader
         title="Projects"
         actions={
-          <Button variant="ghost" onClick={() => setModalOpen(true)}>
+          <Button variant="default" onClick={() => setModalOpen(true)}>
             + Add
           </Button>
         }
       />
-      <div className="flex-1 overflow-y-auto px-4 py-3">
+      <div className="flex-1 overflow-y-auto px-5 py-4">
         {state.environments.length === 0 ? (
           <EmptyState
             title="No projects"
@@ -63,7 +63,7 @@ export function Environments() {
           />
         ) : (
           <>
-            <div className="text-caption-xs text-txt-quaternary uppercase tracking-[0.06em] px-3 mb-1">
+            <div className="text-caption-xs text-txt-tertiary uppercase tracking-[0.06em] mb-2">
               {state.environments.length} registered
             </div>
             <Table>
@@ -88,7 +88,7 @@ export function Environments() {
                       </span>
                     </TD>
                     <TD>
-                      <span className="text-caption-xs text-txt-tertiary">{env.profile_name || '—'}</span>
+                      <span className="text-caption-xs text-txt-tertiary">{env.profile_name || '---'}</span>
                     </TD>
                     <TD>
                       <span className="text-caption-xs text-txt-quaternary">{formatTime(env.created_at)}</span>

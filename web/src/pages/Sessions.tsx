@@ -34,7 +34,7 @@ export function Sessions() {
   return (
     <div className="flex flex-col flex-1 min-h-0">
       <MainHeader title="Sessions" />
-      <div className="flex-1 overflow-y-auto px-4 py-3">
+      <div className="flex-1 overflow-y-auto px-5 py-4">
         {state.sessions.length === 0 ? (
           <EmptyState
             title="No active sessions"
@@ -42,7 +42,7 @@ export function Sessions() {
           />
         ) : (
           <>
-            <div className="text-caption-xs text-txt-quaternary uppercase tracking-[0.06em] px-3 mb-1">
+            <div className="text-caption-xs text-txt-tertiary uppercase tracking-[0.06em] mb-2">
               {state.sessions.length} total
             </div>
             <Table>
@@ -76,7 +76,7 @@ export function Sessions() {
                       <span className="font-mono text-caption-xs text-txt-quaternary ml-1.5">{s.id.substring(0, 8)}</span>
                     </TD>
                     <TD>
-                      <span className="text-caption-xs text-txt-tertiary">{s.environment_name || '—'}</span>
+                      <span className="text-caption-xs text-txt-tertiary">{s.environment_name || '---'}</span>
                     </TD>
                     <TD>
                       <span className="font-mono text-caption-xs text-txt-tertiary tabular-nums">:{s.server_port}</span>

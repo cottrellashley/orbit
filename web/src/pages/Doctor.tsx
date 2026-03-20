@@ -33,7 +33,7 @@ export function Doctor() {
           </Button>
         }
       />
-      <div className="flex-1 overflow-y-auto px-4 py-3">
+      <div className="flex-1 overflow-y-auto px-5 py-4">
         {!report ? (
           <EmptyState
             title="No diagnostics yet"
@@ -43,8 +43,8 @@ export function Doctor() {
         ) : (
           <>
             {/* Summary line */}
-            <div className="flex items-center gap-2 px-3 py-2 mb-3">
-              <span className={`text-caption ${report.ok ? 'text-semantic-green' : 'text-semantic-red'}`}>
+            <div className="flex items-center gap-2 bg-bg-raised border border-border-subtle rounded-lg px-4 py-2.5 mb-4">
+              <span className={`text-label ${report.ok ? 'text-semantic-green' : 'text-semantic-red'}`}>
                 {report.ok ? 'All checks passed' : 'Issues found'}
               </span>
               <span className="text-caption-xs text-txt-quaternary">
@@ -53,26 +53,28 @@ export function Doctor() {
             </div>
 
             {/* Check list */}
-            <div className="flex flex-col">
+            <div className="rounded-lg border border-border-subtle overflow-hidden">
               {report.results.map((check, i) => (
                 <div
                   key={i}
-                  className="flex items-start gap-2.5 px-3 py-2 border-b border-border/30 last:border-b-0"
+                  className={`flex items-start gap-3 px-4 py-3 ${
+                    i < report.results.length - 1 ? 'border-b border-border-subtle' : ''
+                  }`}
                 >
                   <div className="mt-[2px] shrink-0">
                     {check.status === 'pass' ? (
-                      <CheckIcon size={12} className="text-semantic-green" />
+                      <CheckIcon size={13} className="text-semantic-green" />
                     ) : check.status === 'warn' ? (
-                      <AlertIcon size={12} className="text-semantic-orange" />
+                      <AlertIcon size={13} className="text-semantic-orange" />
                     ) : (
-                      <XIcon size={12} className="text-semantic-red" />
+                      <XIcon size={13} className="text-semantic-red" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-caption text-txt">{check.name}</div>
                     <div className="text-caption-xs text-txt-tertiary mt-0.5">{check.message}</div>
                     {check.fix && (
-                      <code className="block mt-1 font-mono text-caption-xs text-accent">
+                      <code className="block mt-1 font-mono text-caption-xs text-accent bg-accent-muted px-2 py-1 rounded">
                         {check.fix}
                       </code>
                     )}

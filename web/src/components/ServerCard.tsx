@@ -9,10 +9,10 @@ interface ServerCardProps {
 export function ServerCard({ server, onClick }: ServerCardProps) {
   return (
     <div
-      className="cursor-pointer hover:bg-white/[0.02] transition-colors duration-fast px-3 py-2.5 rounded"
+      className="cursor-pointer bg-bg-raised border border-border-subtle rounded-lg px-4 py-3 hover:border-border-hover hover:bg-bg-hover transition-colors duration-fast"
       onClick={onClick}
     >
-      <div className="flex items-center justify-between mb-1">
+      <div className="flex items-center justify-between mb-1.5">
         <span className="font-mono text-caption text-txt tabular-nums">:{server.port}</span>
         <StatusBadge status={server.healthy ? 'healthy' : 'error'} />
       </div>
@@ -34,6 +34,6 @@ export function ServerCard({ server, onClick }: ServerCardProps) {
 
 export function ServerGrid({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-0.5">{children}</div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">{children}</div>
   )
 }

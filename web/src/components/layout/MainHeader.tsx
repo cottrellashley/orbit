@@ -8,7 +8,7 @@ interface MainHeaderProps {
 
 export function MainHeader({ title, breadcrumb, actions }: MainHeaderProps) {
   return (
-    <div className="flex items-center justify-between px-4 py-2 shrink-0">
+    <div className="flex items-center justify-between px-5 py-2.5 shrink-0 border-b border-border-subtle">
       <div className="flex items-center gap-1.5 min-w-0">
         {breadcrumb && (
           <>
@@ -21,7 +21,7 @@ export function MainHeader({ title, breadcrumb, actions }: MainHeaderProps) {
             <span className="text-caption text-txt-quaternary">/</span>
           </>
         )}
-        <span className="text-caption text-txt-secondary truncate">{title}</span>
+        <span className="text-heading-sm text-txt truncate">{title}</span>
       </div>
       {actions && <div className="flex items-center gap-2 shrink-0">{actions}</div>}
     </div>

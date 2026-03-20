@@ -56,11 +56,13 @@ export function ServerDetail() {
     return (
       <div className="flex flex-col flex-1 min-h-0">
         <MainHeader title="Server" />
-        <EmptyState
-          title="No server selected"
-          description="Go back to the servers page and select a server."
-          action={<Button onClick={() => navigate('nodes')}>Back to Nodes</Button>}
-        />
+        <div className="flex-1 flex items-center justify-center px-5 py-4">
+          <EmptyState
+            title="No server selected"
+            description="Go back to the servers page and select a server."
+            action={<Button onClick={() => navigate('nodes')}>Back to Nodes</Button>}
+          />
+        </div>
       </div>
     )
   }
@@ -71,12 +73,10 @@ export function ServerDetail() {
         title={`:${server.port}`}
         breadcrumb={{ label: 'Nodes', onClick: () => navigate('nodes') }}
       />
-      <div className="flex-1 overflow-y-auto px-4 py-3">
+      <div className="flex-1 overflow-y-auto px-5 py-4">
         {/* Server info */}
-        <div className="flex items-center gap-3 px-3 py-2 mb-3">
-          <div className="flex items-center gap-2">
-            <StatusBadge status={server.healthy ? 'healthy' : 'error'} />
-          </div>
+        <div className="flex items-center gap-3 bg-bg-raised border border-border-subtle rounded-lg px-4 py-2.5 mb-4">
+          <StatusBadge status={server.healthy ? 'healthy' : 'error'} />
           <span className="text-caption-xs text-txt-quaternary">/</span>
           <span className="font-mono text-caption-xs text-txt-tertiary">PID {server.pid}</span>
           {server.version && (
@@ -95,7 +95,7 @@ export function ServerDetail() {
 
         {/* Sessions */}
         {loading ? (
-          <div className="flex items-center gap-2 px-3 py-8 text-txt-quaternary justify-center">
+          <div className="flex items-center gap-2 py-8 text-txt-quaternary justify-center">
             <Spinner size={12} />
             <span className="text-caption-xs">Loading sessions...</span>
           </div>
@@ -108,7 +108,7 @@ export function ServerDetail() {
           />
         ) : (
           <>
-            <div className="text-caption-xs text-txt-quaternary uppercase tracking-[0.06em] px-3 mb-1">
+            <div className="text-caption-xs text-txt-tertiary uppercase tracking-[0.06em] mb-2">
               Sessions ({sessions.length})
             </div>
             <Table>

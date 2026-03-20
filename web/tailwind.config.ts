@@ -5,21 +5,23 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Surfaces — 5-layer depth system
+        // Surfaces — 7-layer depth system
         bg: {
-          DEFAULT: '#09090b',       // Page background (deepest)
-          sidebar: '#0c0c0f',       // Sidebar (half-step up)
-          raised: '#111114',        // Cards, panels
-          surface: '#18181b',       // Inputs, code blocks, inset areas
-          hover: '#1f1f23',         // Hover state
-          active: '#27272a',        // Active/pressed state
+          DEFAULT: '#09090b',       // App shell (deepest)
+          sidebar: '#0c0c0e',       // Sidebar panel
+          content: '#0f0f12',       // Main content area (key layer)
+          raised: '#141417',        // Cards, sections, elevated panels
+          surface: '#19191d',       // Inputs, code blocks, inset areas
+          hover: '#1e1e23',         // Hover state
+          active: '#27272d',        // Active/pressed state
           overlay: '#0b0b0e',       // Modal/popover overlay tint
         },
         // Borders — translucent white for adaptability
         border: {
-          DEFAULT: 'rgba(255, 255, 255, 0.07)',
-          hover: 'rgba(255, 255, 255, 0.13)',
-          active: 'rgba(255, 255, 255, 0.20)',
+          DEFAULT: 'rgba(255, 255, 255, 0.08)',
+          subtle: 'rgba(255, 255, 255, 0.05)',
+          hover: 'rgba(255, 255, 255, 0.14)',
+          active: 'rgba(255, 255, 255, 0.22)',
         },
         // Text — 4-tier luminance hierarchy
         txt: {

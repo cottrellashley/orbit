@@ -34,10 +34,10 @@ export function Modal({ open, onClose, title, children, footer }: ModalProps) {
       }}
       style={{ background: 'rgba(0, 0, 0, 0.70)', backdropFilter: 'blur(4px)' }}
     >
-      <div className="bg-[#111113] border border-border rounded-lg w-full max-w-[400px] animate-modal-in">
+      <div className="bg-bg-raised border border-border rounded-lg w-full max-w-[400px] shadow-xl animate-modal-in">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
-          <span className="text-caption text-txt-secondary">{title}</span>
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+          <span className="text-heading-sm text-txt">{title}</span>
           <button
             onClick={onClose}
             className="text-txt-quaternary hover:text-txt-secondary transition-colors duration-fast cursor-pointer bg-transparent border-none p-0.5"
@@ -47,11 +47,11 @@ export function Modal({ open, onClose, title, children, footer }: ModalProps) {
         </div>
 
         {/* Body */}
-        <div className="px-4 py-3">{children}</div>
+        <div className="px-4 py-4">{children}</div>
 
         {/* Footer */}
         {footer && (
-          <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-border/50">
+          <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-border">
             {footer}
           </div>
         )}

@@ -10,17 +10,17 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const baseClasses =
-  'inline-flex items-center justify-center gap-1.5 font-medium transition-colors duration-fast cursor-pointer border-none rounded'
+  'inline-flex items-center justify-center gap-1.5 font-medium transition-colors duration-fast cursor-pointer border rounded'
 
 const variantClasses: Record<Variant, string> = {
   default:
-    'bg-white/[0.06] text-txt-secondary hover:bg-white/[0.09] hover:text-txt',
+    'bg-bg-raised border-border text-txt-secondary hover:bg-bg-hover hover:text-txt hover:border-border-hover',
   primary:
-    'bg-accent text-white hover:bg-accent-hover',
+    'bg-accent border-accent text-white hover:bg-accent-hover hover:border-accent-hover',
   danger:
-    'bg-transparent text-semantic-red hover:bg-semantic-red/10',
+    'bg-transparent border-transparent text-semantic-red hover:bg-semantic-red/10 hover:border-semantic-red/20',
   ghost:
-    'bg-transparent text-txt-tertiary hover:text-txt-secondary',
+    'bg-transparent border-transparent text-txt-tertiary hover:text-txt-secondary hover:bg-white/[0.04]',
 }
 
 const sizeClasses: Record<Size, string> = {
