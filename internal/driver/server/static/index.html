@@ -1047,6 +1047,191 @@ tr.clickable:hover td {
 .mt-sm { margin-top: var(--space-sm); }
 .mt-md { margin-top: var(--space-md); }
 .mt-lg { margin-top: var(--space-lg); }
+
+/* ======================================================================
+   Sidebar Footer (User Profile)
+   ====================================================================== */
+.sidebar-footer {
+  padding: var(--space-md);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px var(--space-md);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s var(--ease);
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  color: var(--text-secondary);
+  font-family: var(--font);
+}
+
+.profile-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.profile-btn.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.profile-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-active);
+  border: 1px solid var(--border-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: all 0.15s var(--ease);
+}
+
+.profile-btn:hover .profile-avatar,
+.profile-btn.active .profile-avatar {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.profile-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.profile-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+/* ======================================================================
+   Profile Page
+   ====================================================================== */
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  max-width: 680px;
+}
+
+.profile-hero {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.profile-hero-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  border: 2px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.profile-hero-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-hero-info h3 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  margin-bottom: 4px;
+}
+
+.profile-hero-info p {
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.profile-section {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.profile-section-header {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.profile-section-header h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.profile-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  gap: var(--space-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.profile-row:last-child {
+  border-bottom: none;
+}
+
+.profile-row-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.profile-row-value {
+  font-size: 13px;
+  color: var(--text);
+  text-align: right;
+  word-break: break-all;
+}
+
+.profile-row-value .mono {
+  background: var(--bg-active);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+}
 </style>
 </head>
 <body>
@@ -1099,6 +1284,15 @@ tr.clickable:hover td {
         </div>
       </div>
     </nav>
+    <div class="sidebar-footer">
+      <button class="profile-btn" data-page="profile" onclick="navigate('profile')" id="profile-nav-btn" aria-label="Navigate to user profile and settings">
+        <div class="profile-avatar" aria-hidden="true">U</div>
+        <div class="profile-meta">
+          <span class="profile-name">User Profile</span>
+          <span class="profile-label">Settings &amp; info</span>
+        </div>
+      </button>
+    </div>
   </div>
 
   <!-- Main -->
@@ -1251,6 +1445,10 @@ function navigate(page, opts = {}) {
     el.classList.toggle('active', el.dataset.page === page);
   });
 
+  // Also toggle the profile button active state
+  const profileBtn = document.getElementById('profile-nav-btn');
+  if (profileBtn) profileBtn.classList.toggle('active', page === 'profile');
+
   render();
 }
 
@@ -1303,6 +1501,11 @@ function render() {
       subtitle.textContent = 'System diagnostics';
       actions.innerHTML = `<button class="btn btn-sm" onclick="runDoctor()">${icons.activity} Run Checks</button>`;
       renderDoctor(content);
+      break;
+    case 'profile':
+      title.textContent = 'Profile';
+      subtitle.textContent = 'User settings and system information';
+      renderProfile(content);
       break;
   }
 }
@@ -1675,6 +1878,70 @@ function renderDoctor(el) {
           </div>
         </div>
       `).join('')}
+    </div>`;
+}
+
+/* ========================================================================
+   Page: Profile
+   ======================================================================== */
+function renderProfile(el) {
+  const envCount = state.environments.length;
+  const serverCount = state.servers.length;
+  const sessionCount = state.sessions.length;
+
+  el.innerHTML = `
+    <div class="profile-page">
+      <div class="profile-hero">
+        <div class="profile-hero-avatar" aria-hidden="true">U</div>
+        <div class="profile-hero-info">
+          <h3>User Profile</h3>
+          <p>Orbit AI Environment Manager</p>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <div class="profile-section-header"><h4>System Overview</h4></div>
+        <div class="profile-row">
+          <span class="profile-row-label">Environments</span>
+          <span class="profile-row-value">${envCount} registered</span>
+        </div>
+        <div class="profile-row">
+          <span class="profile-row-label">Active Servers</span>
+          <span class="profile-row-value">${serverCount} discovered</span>
+        </div>
+        <div class="profile-row">
+          <span class="profile-row-label">Sessions</span>
+          <span class="profile-row-value">${sessionCount} total</span>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <div class="profile-section-header"><h4>Configuration</h4></div>
+        <div class="profile-row">
+          <span class="profile-row-label">Config Directory</span>
+          <span class="profile-row-value"><span class="mono">~/.config/orbit</span></span>
+        </div>
+        <div class="profile-row">
+          <span class="profile-row-label">Data Store</span>
+          <span class="profile-row-value"><span class="mono">~/.config/orbit/store</span></span>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <div class="profile-section-header"><h4>About</h4></div>
+        <div class="profile-row">
+          <span class="profile-row-label">Application</span>
+          <span class="profile-row-value">Orbit</span>
+        </div>
+        <div class="profile-row">
+          <span class="profile-row-label">Description</span>
+          <span class="profile-row-value">AI Environment Manager</span>
+        </div>
+        <div class="profile-row">
+          <span class="profile-row-label">Source</span>
+          <span class="profile-row-value"><a href="https://github.com/cottrellashley/orbit" target="_blank" rel="noopener noreferrer" aria-label="Orbit source code on GitHub (opens in new tab)" style="color:var(--accent);text-decoration:none">github.com/cottrellashley/orbit</a></span>
+        </div>
+      </div>
     </div>`;
 }
 
