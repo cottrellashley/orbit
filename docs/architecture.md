@@ -15,11 +15,12 @@ the codebase.
                     └────┬─────┴────┬─────┴────┬─────┘
                          │          │          │
                          ▼          ▼          ▼
-                    ┌──────────────────────────────────┐
-                    │        Application Services       │
-                    │  SessionService, EnvironmentService│
-                    │  DoctorService, OpenService, ...  │
-                    └──────────┬───────────────────────┘
+                     ┌──────────────────────────────────┐
+                     │        Application Services       │
+                     │  SessionService, EnvironmentService│
+                     │  DoctorService, OpenService,       │
+                     │  ProjectService, StateQuerier, ... │
+                     └──────────┬───────────────────────┘
                                │
                     ┌──────────▼───────────────────────┐
                     │     Ports (interfaces only)       │
@@ -27,11 +28,12 @@ the codebase.
                     │  EnvironmentRepository, ...       │
                     └──────────┬───────────────────────┘
                                │
-                    ┌──────────▼───────────────────────┐
-                    │     Domain (pure business logic)  │
-                    │  Session, Server, Environment,    │
-                    │  Profile, Report, OpenPlan, ...   │
-                    └──────────────────────────────────┘
+                     ┌──────────▼───────────────────────┐
+                     │     Domain (pure business logic)  │
+                     │  Session, Server, Environment,    │
+                     │  Project, Profile, Report,        │
+                     │  OpenPlan, ProjectOpenPlan, ...   │
+                     └──────────────────────────────────┘
 
                     ┌──────────────────────────────────┐
                     │    Adapters (secondary adapters)   │
@@ -48,7 +50,8 @@ internal/
 ├── app/             # Application services — orchestrate domain + ports
 ├── adapter/         # Driven adapter implementations
 │   ├── opencode/    #   SessionProvider + ServerLifecycle (OpenCode SDK)
-│   ├── jsonstore/   #   EnvironmentRepository (JSON file persistence)
+│   ├── jsonstore/   #   EnvironmentRepository + ProjectRepository (JSON file persistence)
+│   ├── workspace/   #   ConfigWorkspace (XDG-aware filesystem workspace)
 │   └── tmux/        #   WorkspaceManager (tmux subprocess)
 └── driver/          # Driving adapters (primary adapters)
     ├── cli/         #   Cobra commands — includes composition root
@@ -117,20 +120,24 @@ and app services.
 | Port | File | Implemented By |
 |------|------|----------------|
 | `EnvironmentRepository` | `port/repository.go` | `jsonstore.Store` |
+| `ProjectRepository` | `port/repository.go` | bridge via `ProjectRepositoryFromEnvRepo` (native adapter TBD) |
 | `ProfileRepository` | `port/repository.go` | *not yet implemented* |
 | `SessionProvider` | `port/session_provider.go` | `opencode.Adapter` |
 | `ServerLifecycle` | `port/server_lifecycle.go` | `opencode.ServerManager` |
 | `WorkspaceManager` | `port/workspace.go` | `tmux.Manager` |
+| `ConfigWorkspace` | `port/config_workspace.go` | `workspace.DiskWorkspace` |
 
 ## App Services Reference
 
 | Service | File | Dependencies |
 |---------|------|-------------|
-| `SessionService` | `app/session.go` | `EnvironmentRepository`, `SessionProvider`, `ServerLifecycle` (optional) |
+| `SessionService` | `app/session.go` | `EnvironmentRepository`, `SessionProvider`, `ServerLifecycle` (optional), `ProjectRepository` (optional, via `SetProjects`) |
 | `EnvironmentService` | `app/environment.go` | `EnvironmentRepository`, `ProfileRepository` |
-| `DoctorService` | `app/doctor.go` | `EnvironmentRepository`, `SessionProvider`, `ProfileRepository` |
-| `OpenService` | `app/open.go` | `EnvironmentRepository`, `sessionQuerier` (interface) |
+| `ProjectService` | `app/project.go` | `ProjectRepository`, `ProfileRepository` (migration successor to EnvironmentService) |
+| `DoctorService` | `app/doctor.go` | `EnvironmentRepository`, `SessionProvider`, `ProfileRepository`, `ProjectRepository` (optional, via `SetProjects`), `ConfigWorkspace` (optional, via `SetWorkspace`), `toolLookup` func (optional, via `SetToolLookup`) |
+| `OpenService` | `app/open.go` | `EnvironmentRepository`, `sessionQuerier` (interface), `ProjectRepository` (optional, via `SetProjects`), `projectSessionQuerier` (interface, optional) |
 | `ProfileService` | `app/profile.go` | `ProfileRepository` |
+| `StateQuerier` | `app/query.go` | `ProjectService` (optional), `SessionService` (optional), `DoctorService` (optional), `OpenService` (optional) — read-only facade for assistant/tooling queries |
 
 ## Domain Types Reference
 
@@ -139,13 +146,18 @@ and app services.
 | `Session` | `domain/session.go` | Enriched view of a coding session |
 | `Server` | `domain/session.go` | Summary of a discovered coding-agent server |
 | `ManagedServer` | `domain/session.go` | Persistent state of an Orbit-launched server |
-| `Environment` | `domain/environment.go` | Registered environment (path + metadata) |
+| `Environment` | `domain/environment.go` | Registered environment (path + metadata) — legacy, see Project |
+| `Project` | `domain/project.go` | Registered project (successor to Environment) |
+| `ProjectTopology` | `domain/project.go` | Single-repo / multi-repo / unknown classification |
+| `IntegrationTag` | `domain/project.go` | Detected tool/platform tag (git, python, uv, node, etc.) |
+| `RepoInfo` | `domain/project.go` | Metadata for a git repo within a project |
 | `Profile` | `domain/profile.go` | Reusable starter kit for environments |
 | `CheckStatus` | `domain/doctor.go` | Doctor check result status (pass/warn/fail) |
 | `CheckResult` | `domain/doctor.go` | Single diagnostic check outcome |
 | `Report` | `domain/doctor.go` | Full set of doctor check results |
 | `OpenAction` | `domain/open.go` | What the driver should do after resolving an env |
 | `OpenPlan` | `domain/open.go` | Result of resolving an `orbit open` request |
+| `ProjectOpenPlan` | `domain/open.go` | Result of resolving a project-first `orbit open` request (includes `ServerOnline` field) |
 
 ## Drivers
 
@@ -156,14 +168,30 @@ Built with [cobra](https://github.com/spf13/cobra). The composition root
 dependencies via function parameters or closures — they never import
 adapter packages.
 
+Commands:
+- `orbit serve` — start the HTTP server and managed OpenCode server
+- `orbit attach` — attach to a running OpenCode server
+- `orbit project` — manage registered projects (list, add, show, remove)
+
 ### HTTP Server (`internal/driver/server/`)
 
 A standard `net/http` server. Defines its own service interfaces locally
 so it has no import dependency on `internal/app`. Serves:
 
-- REST API at `/api/*`
+- Project-first API at `/api/projects` (new, preferred)
+- Legacy environment API at `/api/environments` (compatibility, to be deprecated)
+- Session/server/doctor APIs at `/api/sessions`, `/api/servers`, `/api/doctor`
 - Reverse proxy to OpenCode servers at `/api/proxy/{port}/{path...}`
 - Embedded web UI (`index.html`) at `/`
+
+The web UI is a single embedded HTML file (`static/index.html`) with vanilla
+JS. It consumes the REST API exclusively — no domain or app imports. The UI
+is project-first: the primary navigation uses `/api/projects`, while
+`/api/environments` is available under a legacy section with deprecation
+notices.
+
+See `docs/api-migration.md` for the full endpoint matrix, UI migration
+details, and migration path.
 
 ### TUI (`internal/driver/tui/`)
 

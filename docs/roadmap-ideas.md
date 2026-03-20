@@ -109,19 +109,7 @@ not about running them directly.
 
 ---
 
-## 3. Session View Redesign — Hierarchical Sessions
-
-The current sessions view is flat and too busy. Fix:
-
-- Top level shows only **individual sessions** (parent sessions)
-- Each session row is expandable (dropdown/accordion)
-- Expanding reveals **sub-sessions** (sub-agents spawned within that session)
-- Collapsed by default — clean and scannable
-- Expand to see the full tree when needed
-
----
-
-## 4. Session Launch — Jump Into Sessions
+## 3. Session Launch — Jump Into Sessions
 
 Users should be able to **open/launch** a session and choose:
 - **OpenCode TUI**: opens terminal with `opencode attach` to that session
@@ -131,7 +119,7 @@ Jump straight INTO the session from the Orbit UI. Orbit is the launchpad.
 
 ---
 
-## 5. Profile Builder
+## 4. Profile Builder
 
 A full profile creation/editing environment where users can:
 - Build new **Skills** (custom skill definitions)
@@ -144,7 +132,7 @@ reusable configuration template that gets applied when setting up a project.
 
 ---
 
-## 6. GitHub Adapter / Port
+## 5. GitHub Adapter / Port
 
 A new adapter implementing a GitHub port interface. Must go through
 `domain/ -> port/ -> adapter/` (hexagonal, no shortcuts). Capabilities:
@@ -165,7 +153,7 @@ All via core domain/app so the same functionality is available through:
 
 ---
 
-## 7. Enhanced Doctor Checks
+## 6. Enhanced Doctor Checks
 
 Add these checks to the doctor system:
 
@@ -178,7 +166,7 @@ These feed into project setup detection and the integration tags.
 
 ---
 
-## 8. Navigation & Linking
+## 7. Navigation & Linking
 
 Since Orbit is a manager/control plane, heavy emphasis on **jumping out**:
 - Jump into GitHub agents (redirect to GitHub)
@@ -190,7 +178,7 @@ Orbit doesn't replicate these UIs — it links to them and launches them.
 
 ---
 
-## 9. Markdown Rendering Engine (from OpenDoc)
+## 8. Markdown Rendering Engine (from OpenDoc)
 
 Take the markdown rendering engine from **OpenDoc** (`cottrellashley/opendoc`)
 — our own static site generator with integrated workbench and terminal — and
@@ -221,7 +209,7 @@ a user clicks on them.
 
 ---
 
-## 10. Orbit Config Directory — Managed Workspace
+## 9. Orbit Config Directory — Managed Workspace
 
 A dedicated, closed directory specifically for Orbit's own configuration
 and state. This is the user's space for managing their entire setup,
@@ -240,7 +228,7 @@ and the Orbit Assistant operates within it.
 ### Key properties
 
 - **Browsable in the UI**: The Orbit web UI and TUI can navigate this
-  directory structure, rendering markdown files inline (see section 9)
+  directory structure, rendering markdown files inline (see section 8)
 - **Orbit Assistant has full access**: The personalised Orbit agent can
   read, write, and organise files in this directory — helping users
   manage their setup through conversation
@@ -252,7 +240,7 @@ and the Orbit Assistant operates within it.
 
 ---
 
-## 11. UI Inspiration — Study OpenClaw
+## 10. UI Inspiration — Study OpenClaw
 
 Take inspiration from **OpenClaw** (openclaw/openclaw) for UI/UX decisions —
 specifically tab groupings, naming conventions, navigation structure, and

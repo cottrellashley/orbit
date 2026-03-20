@@ -26,6 +26,31 @@ type EnvironmentRepository interface {
 	Delete(name string) error
 }
 
+// ProjectRepository persists and retrieves project registry entries.
+// It parallels EnvironmentRepository for the new Project domain type.
+// During the migration period, adapters may implement both interfaces
+// backed by the same storage, converting between the two representations.
+type ProjectRepository interface {
+	// List returns all registered projects.
+	// Returns an empty slice (not nil) if none exist.
+	List() ([]*domain.Project, error)
+
+	// Get returns a single project by name.
+	// Returns domain.ErrNotFound if not found.
+	Get(name string) (*domain.Project, error)
+
+	// GetByPath returns the project whose registered path matches.
+	// Returns domain.ErrNotFound if no match.
+	GetByPath(path string) (*domain.Project, error)
+
+	// Save persists the full project list (create or update).
+	Save(projects []*domain.Project) error
+
+	// Delete removes a project by name.
+	// Returns domain.ErrNotFound if not found.
+	Delete(name string) error
+}
+
 // ProfileRepository manages profile starter kits on disk.
 type ProfileRepository interface {
 	// List returns all available profiles.

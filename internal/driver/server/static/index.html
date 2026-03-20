@@ -7,6 +7,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5/css/xterm.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5/lib/xterm.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0/lib/addon-fit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@xterm/addon-webgl@0/lib/addon-webgl.min.js"></script>
 <style>
 /* ======================================================================
    Reset & Custom Properties
@@ -14,60 +18,60 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* Surfaces — dark saturated grays, never pure black */
-  --bg:          #0f1117;
-  --bg-raised:   #161921;
-  --bg-surface:  #1c1f2b;
-  --bg-hover:    #242836;
-  --bg-active:   #2a2f40;
+  /* Surfaces — near-black, tight contrast */
+  --bg:          #09090b;
+  --bg-raised:   #0f0f12;
+  --bg-surface:  #151518;
+  --bg-hover:    #1a1a1f;
+  --bg-active:   #222228;
 
-  /* Borders — subtle, low contrast */
+  /* Borders — subtle */
   --border:      rgba(255, 255, 255, 0.06);
-  --border-hover:rgba(255, 255, 255, 0.10);
+  --border-hover:rgba(255, 255, 255, 0.12);
 
   /* Text */
-  --text:        #e8ecf4;
-  --text-secondary: #9ba3b5;
-  --text-tertiary:  #5f6880;
+  --text:        #e4e4e7;
+  --text-secondary: #a1a1aa;
+  --text-tertiary:  #52525b;
 
-  /* Accent — single blue, used sparingly */
-  --accent:      #4C8BF5;
-  --accent-soft:  rgba(76, 139, 245, 0.12);
-  --accent-hover: #5E9AFF;
+  /* Accent — orange */
+  --accent:      #F97316;
+  --accent-soft:  rgba(249, 115, 22, 0.12);
+  --accent-hover: #FB923C;
 
   /* Semantic */
   --green:       #34D399;
-  --green-soft:  rgba(52, 211, 153, 0.12);
+  --green-soft:  rgba(52, 211, 153, 0.10);
   --yellow:      #FBBF24;
-  --yellow-soft: rgba(251, 191, 36, 0.12);
+  --yellow-soft: rgba(251, 191, 36, 0.10);
   --red:         #F87171;
-  --red-soft:    rgba(248, 113, 113, 0.12);
+  --red-soft:    rgba(248, 113, 113, 0.10);
   --orange:      #FB923C;
-  --orange-soft: rgba(251, 146, 60, 0.12);
+  --orange-soft: rgba(251, 146, 60, 0.10);
 
   /* Typography */
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
 
-  /* Spacing */
-  --space-xs:  4px;
-  --space-sm:  8px;
-  --space-md:  16px;
-  --space-lg:  24px;
-  --space-xl:  32px;
-  --space-2xl: 48px;
+  /* Spacing — compact */
+  --space-xs:  3px;
+  --space-sm:  6px;
+  --space-md:  12px;
+  --space-lg:  18px;
+  --space-xl:  24px;
+  --space-2xl: 36px;
 
-  /* Radii */
-  --radius-sm: 6px;
-  --radius:    10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
+  /* Radii — tighter */
+  --radius-sm: 4px;
+  --radius:    6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
 
-  /* Shadows — light from above */
-  --shadow-sm:  0 1px 2px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.15);
-  --shadow:     0 2px 8px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2);
-  --shadow-lg:  0 8px 24px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2);
-  --shadow-xl:  0 16px 48px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.3);
+  /* Shadows — minimal, dark */
+  --shadow-sm:  0 1px 2px rgba(0,0,0,0.4);
+  --shadow:     0 1px 4px rgba(0,0,0,0.5);
+  --shadow-lg:  0 4px 16px rgba(0,0,0,0.5);
+  --shadow-xl:  0 8px 32px rgba(0,0,0,0.6);
 
   /* Transitions */
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
@@ -94,8 +98,8 @@ body {
 
 /* --- Sidebar --- */
 .sidebar {
-  width: 260px;
-  min-width: 260px;
+  width: 220px;
+  min-width: 220px;
   background: var(--bg-raised);
   display: flex;
   flex-direction: column;
@@ -104,7 +108,7 @@ body {
 }
 
 .sidebar-header {
-  padding: var(--space-xl) var(--space-lg) var(--space-lg);
+  padding: var(--space-lg) var(--space-md) var(--space-md);
 }
 
 .sidebar-logo {
@@ -114,64 +118,63 @@ body {
 }
 
 .sidebar-logo-icon {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   background: var(--accent);
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-sm);
 }
 
 .sidebar-logo-icon svg {
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
   color: #fff;
 }
 
 .sidebar-logo h1 {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.3px;
   color: var(--text);
 }
 
 .sidebar-logo .version {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   color: var(--text-tertiary);
-  margin-top: 1px;
+  margin-top: 0;
 }
 
 .sidebar-nav {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--space-xs) var(--space-sm);
 }
 
 .nav-group {
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-md);
 }
 
 .nav-group-label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.8px;
   color: var(--text-tertiary);
-  padding: var(--space-sm) var(--space-md);
-  margin-bottom: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  margin-bottom: 2px;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px var(--space-md);
+  gap: 10px;
+  padding: 6px var(--space-sm);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text-secondary);
   transition: all 0.15s var(--ease);
@@ -190,8 +193,8 @@ body {
 }
 
 .nav-item .nav-icon {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   flex-shrink: 0;
   opacity: 0.7;
 }
@@ -204,11 +207,11 @@ body {
   margin-left: auto;
   background: var(--bg-active);
   color: var(--text-tertiary);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  padding: 2px 8px;
+  padding: 1px 6px;
   border-radius: 100px;
-  min-width: 24px;
+  min-width: 20px;
   text-align: center;
 }
 
@@ -227,30 +230,30 @@ body {
 }
 
 .main-header {
-  padding: var(--space-lg) var(--space-xl);
+  padding: var(--space-md) var(--space-lg);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 72px;
+  min-height: 48px;
   border-bottom: 1px solid var(--border);
 }
 
 .main-header h2 {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.3px;
 }
 
 .main-header .subtitle {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-tertiary);
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .main-content {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-xl);
+  padding: var(--space-lg);
 }
 
 /* ======================================================================
@@ -279,10 +282,10 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 8px 16px;
+  gap: 5px;
+  padding: 5px 12px;
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   font-family: var(--font);
   cursor: pointer;
@@ -303,7 +306,6 @@ body {
   background: var(--accent);
   border-color: var(--accent);
   color: #fff;
-  box-shadow: var(--shadow-sm);
 }
 
 .btn-primary:hover {
@@ -322,22 +324,22 @@ body {
 }
 
 .btn-sm {
-  padding: 5px 12px;
-  font-size: 12px;
+  padding: 3px 8px;
+  font-size: 11px;
 }
 
 .btn-icon {
-  padding: 6px 8px;
+  padding: 4px 6px;
 }
 
 .btn svg {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
 }
 
 .btn-group {
   display: flex;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
 }
 
 /* ======================================================================
@@ -346,12 +348,12 @@ body {
 .card {
   background: var(--bg-raised);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
   overflow: hidden;
 }
 
 .card-header {
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -359,12 +361,12 @@ body {
 }
 
 .card-header h3 {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
 }
 
 .card-body {
-  padding: var(--space-lg);
+  padding: var(--space-md);
 }
 
 /* ======================================================================
@@ -372,31 +374,31 @@ body {
    ====================================================================== */
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-md);
-  margin-bottom: var(--space-xl);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
 }
 
 .summary-card {
   background: var(--bg-raised);
   border-radius: var(--radius);
-  padding: var(--space-lg);
-  box-shadow: var(--shadow-sm);
+  padding: var(--space-md);
+  border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
-  transition: all 0.2s var(--ease);
+  gap: var(--space-xs);
+  transition: all 0.15s var(--ease);
   cursor: pointer;
 }
 
 .summary-card:hover {
-  box-shadow: var(--shadow);
-  transform: translateY(-1px);
+  border-color: var(--border-hover);
+  background: var(--bg-surface);
 }
 
 .summary-card-icon {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
@@ -404,8 +406,8 @@ body {
 }
 
 .summary-card-icon svg {
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
 }
 
 .summary-card-icon.blue   { background: var(--accent-soft); color: var(--accent); }
@@ -414,14 +416,14 @@ body {
 .summary-card-icon.red    { background: var(--red-soft); color: var(--red); }
 
 .summary-card-value {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 700;
-  letter-spacing: -1px;
+  letter-spacing: -0.5px;
   line-height: 1;
 }
 
 .summary-card-label {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 500;
   color: var(--text-tertiary);
 }
@@ -436,22 +438,22 @@ body {
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 th {
   text-align: left;
   font-weight: 600;
-  font-size: 11px;
+  font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.6px;
   color: var(--text-tertiary);
-  padding: 12px var(--space-lg);
+  padding: 8px var(--space-md);
   border-bottom: 1px solid var(--border);
 }
 
 td {
-  padding: 14px var(--space-lg);
+  padding: 8px var(--space-md);
   border-bottom: 1px solid var(--border);
   vertical-align: middle;
 }
@@ -473,16 +475,16 @@ tr.clickable:hover td {
 .status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
+  gap: 5px;
+  font-size: 11px;
   font-weight: 500;
-  padding: 3px 10px;
+  padding: 2px 8px;
   border-radius: 100px;
 }
 
 .status-badge .dot {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   flex-shrink: 0;
 }
@@ -538,24 +540,24 @@ tr.clickable:hover td {
    ====================================================================== */
 .server-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: var(--space-md);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-sm);
 }
 
 .server-card {
   background: var(--bg-raised);
   border-radius: var(--radius);
-  padding: var(--space-lg);
-  box-shadow: var(--shadow-sm);
+  padding: var(--space-md);
+  border: 1px solid var(--border);
   cursor: pointer;
-  transition: all 0.2s var(--ease);
+  transition: all 0.15s var(--ease);
   border-left: 3px solid transparent;
   position: relative;
 }
 
 .server-card:hover {
-  box-shadow: var(--shadow);
-  transform: translateY(-1px);
+  border-color: var(--border-hover);
+  background: var(--bg-surface);
 }
 
 .server-card.healthy {
@@ -570,28 +572,28 @@ tr.clickable:hover td {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-sm);
 }
 
 .server-card-top strong {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
 }
 
 .server-card-dir {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-sm);
 }
 
 .server-card-meta {
   display: flex;
-  gap: var(--space-lg);
-  font-size: 12px;
+  gap: var(--space-md);
+  font-size: 11px;
   color: var(--text-tertiary);
 }
 
@@ -607,13 +609,13 @@ tr.clickable:hover td {
 .detail-header {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
-  margin-bottom: var(--space-xl);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
 }
 
 .back-btn {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
@@ -630,20 +632,20 @@ tr.clickable:hover td {
 }
 
 .back-btn svg {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
 }
 
 .detail-info { flex: 1; }
 .detail-info h2 {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
   letter-spacing: -0.3px;
 }
 .detail-info .meta {
-  font-size: 13px;
+  font-size: 11px;
   color: var(--text-tertiary);
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 /* ======================================================================
@@ -652,35 +654,33 @@ tr.clickable:hover td {
 .conversation {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-sm);
   max-width: 860px;
 }
 
 .message {
   display: flex;
-  gap: var(--space-md);
-  padding: var(--space-lg);
+  gap: var(--space-sm);
+  padding: var(--space-md);
   border-radius: var(--radius);
 }
 
 .message-user {
   background: var(--bg-surface);
-  box-shadow: var(--shadow-sm);
 }
 
 .message-assistant {
   background: var(--bg-raised);
-  box-shadow: var(--shadow-sm);
 }
 
 .message-avatar {
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -691,8 +691,8 @@ tr.clickable:hover td {
 }
 
 .message-assistant .message-avatar {
-  background: rgba(168, 130, 255, 0.12);
-  color: #a882ff;
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 .message-body {
@@ -765,17 +765,17 @@ tr.clickable:hover td {
 .doctor-summary {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-lg);
+  gap: var(--space-sm);
+  padding: var(--space-md);
   background: var(--bg-raised);
   border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  margin-bottom: var(--space-lg);
+  border: 1px solid var(--border);
+  margin-bottom: var(--space-md);
 }
 
 .doctor-summary-icon {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -787,40 +787,40 @@ tr.clickable:hover td {
 .doctor-summary-icon.fail { background: var(--red-soft); color: var(--red); }
 
 .doctor-summary-icon svg {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
 }
 
 .doctor-summary-text h3 {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
 }
 
 .doctor-summary-text p {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-tertiary);
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .check-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
 }
 
 .check-item {
   background: var(--bg-raised);
   border-radius: var(--radius-sm);
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   display: flex;
   align-items: flex-start;
-  gap: var(--space-md);
-  box-shadow: var(--shadow-sm);
+  gap: var(--space-sm);
+  border: 1px solid var(--border);
 }
 
 .check-icon {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -830,8 +830,8 @@ tr.clickable:hover td {
 }
 
 .check-icon svg {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
 }
 
 .check-icon.pass { background: var(--green-soft); color: var(--green); }
@@ -841,25 +841,25 @@ tr.clickable:hover td {
 .check-content { flex: 1; }
 
 .check-content .check-name {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   font-family: var(--font-mono);
 }
 
 .check-content .check-message {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-secondary);
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .check-content .check-fix {
-  font-size: 12px;
+  font-size: 11px;
   font-family: var(--font-mono);
   color: var(--text-tertiary);
-  margin-top: 4px;
-  padding: 6px 10px;
+  margin-top: 3px;
+  padding: 4px 8px;
   background: var(--bg);
-  border-radius: 4px;
+  border-radius: 3px;
   display: inline-block;
 }
 
@@ -871,39 +871,39 @@ tr.clickable:hover td {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px var(--space-xl);
+  padding: 48px var(--space-lg);
   color: var(--text-tertiary);
   text-align: center;
 }
 
 .empty-state-icon {
-  width: 56px;
-  height: 56px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius);
   background: var(--bg-surface);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-md);
 }
 
 .empty-state-icon svg {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   opacity: 0.5;
 }
 
 .empty-state h3 {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-secondary);
   margin-bottom: var(--space-xs);
 }
 
 .empty-state p {
-  font-size: 14px;
-  max-width: 360px;
-  line-height: 1.6;
+  font-size: 13px;
+  max-width: 320px;
+  line-height: 1.5;
 }
 
 /* ======================================================================
@@ -924,8 +924,9 @@ tr.clickable:hover td {
 .modal {
   background: var(--bg-raised);
   border-radius: var(--radius-lg);
-  width: 480px;
+  width: 420px;
   max-width: 90vw;
+  border: 1px solid var(--border);
   box-shadow: var(--shadow-xl);
   animation: modalIn 0.2s var(--ease);
 }
@@ -941,7 +942,7 @@ tr.clickable:hover td {
 }
 
 .modal-header {
-  padding: var(--space-lg);
+  padding: var(--space-md);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -949,24 +950,24 @@ tr.clickable:hover td {
 }
 
 .modal-header h3 {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
 }
 
 .modal-body {
-  padding: var(--space-lg);
+  padding: var(--space-md);
 }
 
 .modal-footer {
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   border-top: 1px solid var(--border);
   display: flex;
   justify-content: flex-end;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
 }
 
 .form-group {
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-sm);
 }
 
 .form-group:last-child {
@@ -975,21 +976,21 @@ tr.clickable:hover td {
 
 .form-group label {
   display: block;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text-secondary);
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .form-group input,
 .form-group textarea {
   width: 100%;
-  padding: 10px 14px;
+  padding: 7px 10px;
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text);
-  font-size: 14px;
+  font-size: 13px;
   font-family: var(--font);
   transition: border-color 0.15s var(--ease);
 }
@@ -1047,6 +1048,130 @@ tr.clickable:hover td {
 .mt-sm { margin-top: var(--space-sm); }
 .mt-md { margin-top: var(--space-md); }
 .mt-lg { margin-top: var(--space-lg); }
+
+/* ======================================================================
+   Terminal Container — xterm.js PTY bridge
+   ====================================================================== */
+.terminal-container {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 100px);
+  background: #000;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.terminal-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  background: var(--bg);
+  z-index: 10;
+}
+
+.terminal-loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: terminal-spin 0.8s linear infinite;
+}
+
+@keyframes terminal-spin {
+  to { transform: rotate(360deg); }
+}
+
+.terminal-loading-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.terminal-loading-sub {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.terminal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  z-index: 20;
+  backdrop-filter: blur(4px);
+}
+
+.terminal-overlay-msg {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* ======================================================================
+   Code Block Copy Buttons
+   ====================================================================== */
+.code-block-wrapper {
+  position: relative;
+}
+
+.code-block-wrapper pre {
+  margin: 0;
+}
+
+.code-copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--font);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s var(--ease), background 0.15s var(--ease);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.code-block-wrapper:hover .code-copy-btn {
+  opacity: 1;
+}
+
+.code-copy-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.code-copy-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+.code-lang {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+  opacity: 0.6;
+}
 </style>
 </head>
 <body>
@@ -1081,6 +1206,13 @@ tr.clickable:hover td {
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           <span>Sessions</span>
           <span class="nav-badge" id="session-count">-</span>
+        </div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">AI</div>
+        <div class="nav-item" data-page="chat" onclick="navigate('chat')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          <span>Chat</span>
         </div>
       </div>
       <div class="nav-group">
@@ -1134,6 +1266,8 @@ const icons = {
   folder: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>',
   activity: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
   close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+  copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+  terminal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>',
 };
 
 /* ========================================================================
@@ -1147,7 +1281,7 @@ const state = {
   doctor: null,
   selectedSession: null,
   selectedServer: null,
-  sessionMessages: [],
+  tuiOpts: null,           // { serverURL, sessionID?, title? } — for OpenCodeTUI
   loading: false,
 };
 
@@ -1215,16 +1349,6 @@ async function fetchDoctor() {
   }
 }
 
-async function fetchSessionMessages(port, sessionID) {
-  try {
-    const msgs = await proxyGet(port, `/session/${sessionID}/message`);
-    return msgs || [];
-  } catch (e) {
-    console.error('fetch messages:', e);
-    return [];
-  }
-}
-
 async function fetchSessionStatus(port) {
   try {
     return await proxyGet(port, '/session/status');
@@ -1242,10 +1366,16 @@ function updateBadge(id, count) {
    Navigation
    ======================================================================== */
 function navigate(page, opts = {}) {
+  // Destroy terminal when leaving a TUI page
+  const tuiPages = ['chat', 'tui'];
+  if (tuiPages.includes(state.page) && !tuiPages.includes(page)) {
+    OpenCodeTUI.destroy();
+  }
+
   state.page = page;
   state.selectedSession = opts.session || null;
   state.selectedServer = opts.server || null;
-  state.sessionMessages = [];
+  state.tuiOpts = opts.tuiOpts || null;
 
   document.querySelectorAll('.nav-item').forEach(el => {
     el.classList.toggle('active', el.dataset.page === page);
@@ -1284,9 +1414,11 @@ function render() {
       actions.innerHTML = `<button class="btn btn-sm" onclick="refreshAll()">${icons.refresh} Refresh</button>`;
       renderSessions(content);
       break;
-    case 'session-detail':
-      title.textContent = 'Session';
-      renderSessionDetail(content);
+    case 'tui':
+      title.textContent = state.tuiOpts?.title || 'Session';
+      subtitle.textContent = state.tuiOpts?.sessionID ? state.tuiOpts.sessionID.substring(0, 12) : '';
+      actions.innerHTML = `<button class="btn btn-sm" onclick="OpenCodeTUI.reconnect()">${icons.refresh} Reconnect</button>`;
+      renderTUI(content);
       break;
     case 'server-detail':
       title.textContent = 'Server';
@@ -1303,6 +1435,12 @@ function render() {
       subtitle.textContent = 'System diagnostics';
       actions.innerHTML = `<button class="btn btn-sm" onclick="runDoctor()">${icons.activity} Run Checks</button>`;
       renderDoctor(content);
+      break;
+    case 'chat':
+      title.textContent = 'Chat';
+      subtitle.textContent = 'New AI Session';
+      actions.innerHTML = `<button class="btn btn-sm" onclick="OpenCodeTUI.reconnect()">${icons.refresh} Reconnect</button>`;
+      renderChat(content);
       break;
   }
 }
@@ -1351,7 +1489,7 @@ function renderDashboard(el) {
         <div class="table-wrap"><table>
           <thead><tr><th>Title</th><th>Environment</th><th>Status</th><th>Created</th></tr></thead>
           <tbody>${state.sessions.slice(0, 5).map(s => `
-            <tr class="clickable" onclick="openSessionConvo(${s.server_port}, '${esc(s.id)}', '${esc(s.title || 'Untitled')}')">
+            <tr class="clickable" onclick="openSessionTUI(${s.server_port}, '${esc(s.id)}', '${esc(s.title || 'Untitled')}')">
               <td><strong>${esc(s.title || 'Untitled')}</strong><br><span class="mono text-dim">${esc((s.id || '').substring(0, 8))}</span></td>
               <td>${s.environment_name ? esc(s.environment_name) : '<span class="text-dim">--</span>'}</td>
               <td>${statusBadge(s.status || 'unknown')}</td>
@@ -1428,7 +1566,8 @@ async function renderServerDetail(el) {
       proxyGet(s.port, '/session'),
       fetchSessionStatus(s.port),
     ]);
-    renderServerSessions(document.getElementById('server-sessions-area'), sessions || [], statuses || {}, s.port);
+    const topLevel = (sessions || []).filter(s => !s.parentID);
+    renderServerSessions(document.getElementById('server-sessions-area'), topLevel, statuses || {}, s.port);
   } catch (e) {
     document.getElementById('server-sessions-area').innerHTML =
       `<div class="empty-state"><p>Could not load sessions: ${esc(e.message)}</p></div>`;
@@ -1448,7 +1587,7 @@ function renderServerSessions(el, sessions, statuses, port) {
         <thead><tr><th>Title</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
         <tbody>${sessions.map(s => {
           const st = statuses[s.id] || { type: 'unknown' };
-          return `<tr class="clickable" onclick="openSessionConvo(${port}, '${esc(s.id)}', '${esc(s.title || 'Untitled')}')">
+          return `<tr class="clickable" onclick="openSessionTUI(${port}, '${esc(s.id)}', '${esc(s.title || 'Untitled')}')">
             <td><strong>${esc(s.title || 'Untitled')}</strong><br><span class="mono text-dim">${esc(s.id.substring(0, 8))}</span></td>
             <td>${statusBadge(st.type)}</td>
             <td class="text-sm text-dim">${formatTime(s.time?.created)}</td>
@@ -1478,7 +1617,7 @@ function renderSessions(el) {
       <div class="table-wrap"><table>
         <thead><tr><th>Title</th><th>Environment</th><th>Server</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
         <tbody>${state.sessions.map(s => `
-          <tr class="clickable" onclick="openSessionConvo(${s.server_port}, '${esc(s.id)}', '${esc(s.title || 'Untitled')}')">
+          <tr class="clickable" onclick="openSessionTUI(${s.server_port}, '${esc(s.id)}', '${esc(s.title || 'Untitled')}')">
             <td><strong>${esc(s.title || 'Untitled')}</strong><br><span class="mono text-dim">${esc((s.id || '').substring(0, 8))}</span></td>
             <td>${s.environment_name ? esc(s.environment_name) : '<span class="text-dim">--</span>'}</td>
             <td class="mono text-sm">:${s.server_port}</td>
@@ -1497,108 +1636,44 @@ function renderSessions(el) {
 }
 
 /* ========================================================================
-   Session Detail / Conversation
+   Open Session in OpenCode TUI
    ======================================================================== */
-async function openSessionConvo(port, sessionID, title) {
-  state.page = 'session-detail';
-  state.selectedSession = { port, sessionID, title };
-  state.sessionMessages = [];
-  render();
-
-  const msgsArea = document.getElementById('messages-area');
-  if (!msgsArea) return;
-
-  msgsArea.innerHTML = `<div style="padding:var(--space-xl);color:var(--text-tertiary)"><span class="spinner"></span> Loading conversation...</div>`;
-
-  const messages = await fetchSessionMessages(port, sessionID);
-  state.sessionMessages = messages;
-  renderMessages(msgsArea, messages);
+function openSessionTUI(port, sessionID, title) {
+  const serverURL = 'http://127.0.0.1:' + port;
+  navigate('tui', {
+    tuiOpts: { serverURL, sessionID, title: title || 'Untitled' },
+  });
 }
 
-function renderSessionDetail(el) {
-  const s = state.selectedSession;
-  if (!s) { navigate('sessions'); return; }
+/* ========================================================================
+   Page: TUI — OpenCode session terminal
+   ======================================================================== */
+function renderTUI(el) {
+  const opts = state.tuiOpts;
+  if (!opts || !opts.serverURL) { navigate('sessions'); return; }
 
   el.innerHTML = `
-    <div class="detail-header">
+    <div class="detail-header" style="margin-bottom:var(--space-md)">
       <span class="back-btn" onclick="navigate('sessions')">${icons.arrowLeft}</span>
       <div class="detail-info">
-        <h2>${esc(s.title)}</h2>
-        <div class="meta">Port ${s.port} &middot; ${esc(s.sessionID.substring(0, 12))}</div>
-      </div>
-      <div class="btn-group">
-        <button class="btn btn-sm" onclick="openSessionConvo(${s.port}, '${esc(s.sessionID)}', '${esc(s.title)}')">${icons.refresh} Reload</button>
+        <h2>${esc(opts.title || 'Session')}</h2>
+        <div class="meta">${opts.sessionID ? esc(opts.sessionID.substring(0, 12)) + ' &middot; ' : ''}${esc(opts.serverURL)}</div>
       </div>
     </div>
-    <div id="messages-area"></div>`;
-}
+    <div class="terminal-container">
+      <div class="terminal-loading" id="terminal-loading">
+        <div class="terminal-loading-spinner"></div>
+        <div class="terminal-loading-text">Connecting to session...</div>
+        <div class="terminal-loading-sub" id="terminal-loading-sub">Initializing</div>
+      </div>
+      <div id="terminal-xterm" style="display:none;width:100%;height:100%"></div>
+      <div class="terminal-overlay" id="terminal-overlay" style="display:none">
+        <div class="terminal-overlay-msg" id="terminal-overlay-msg"></div>
+        <button class="btn btn-primary btn-sm" id="terminal-overlay-action" style="display:none">Reconnect</button>
+      </div>
+    </div>`;
 
-function renderMessages(el, messages) {
-  if (!messages || messages.length === 0) {
-    el.innerHTML = `<div class="empty-state"><h3>No messages</h3><p>This session has no messages yet.</p></div>`;
-    return;
-  }
-
-  let html = '<div class="conversation">';
-  for (const msg of messages) {
-    const info = msg.info;
-    const parts = msg.parts || [];
-
-    let role = 'unknown';
-    let roleLabel = 'Message';
-    try {
-      const parsed = typeof info === 'string' ? JSON.parse(info) : info;
-      role = parsed.role || 'unknown';
-    } catch (e) {}
-
-    if (role === 'user') roleLabel = 'You';
-    else if (role === 'assistant') roleLabel = 'Assistant';
-
-    const textParts = [];
-    const toolParts = [];
-    for (const p of parts) {
-      if (p.type === 'text' && p.text) textParts.push(p.text);
-      else if (p.type === 'tool-invocation' || p.type === 'tool-result' || p.tool) toolParts.push(p);
-      else if (p.text) textParts.push(p.text);
-    }
-
-    const isUser = role === 'user';
-    html += `
-      <div class="message message-${isUser ? 'user' : 'assistant'}">
-        <div class="message-avatar">${isUser ? 'U' : 'A'}</div>
-        <div class="message-body">
-          <div class="message-role">${esc(roleLabel)}</div>
-          ${textParts.length > 0 ? `<div class="message-text">${formatMessageText(textParts.join('\n'))}</div>` : ''}
-          ${toolParts.map(t => `
-            <div class="tool-call">
-              <span class="tool-call-name">${esc(t.tool || t.type || 'tool')}</span>
-              ${t.text ? `<div class="message-text" style="margin-top:6px;font-size:12px">${formatMessageText(t.text.substring(0, 500))}${t.text.length > 500 ? '...' : ''}</div>` : ''}
-            </div>
-          `).join('')}
-          ${renderMessageMeta(msg)}
-        </div>
-      </div>`;
-  }
-  html += '</div>';
-  el.innerHTML = html;
-  el.scrollTop = el.scrollHeight;
-}
-
-function renderMessageMeta(msg) {
-  const info = typeof msg.info === 'string' ? JSON.parse(msg.info) : msg.info;
-  if (!info) return '';
-
-  const parts = [];
-  if (info.tokens) {
-    const t = info.tokens;
-    if (t.input) parts.push(`In: ${t.input}`);
-    if (t.output) parts.push(`Out: ${t.output}`);
-  }
-  if (info.cost && info.cost > 0) parts.push(`$${info.cost.toFixed(4)}`);
-  if (info.modelID) parts.push(info.modelID);
-
-  if (parts.length === 0) return '';
-  return `<div class="message-meta">${parts.map(p => `<span>${esc(p)}</span>`).join('')}</div>`;
+  OpenCodeTUI.open(opts);
 }
 
 /* ========================================================================
@@ -1676,6 +1751,27 @@ function renderDoctor(el) {
         </div>
       `).join('')}
     </div>`;
+}
+
+/* ========================================================================
+   Page: Chat (AI Terminal)
+   ======================================================================== */
+function renderChat(el) {
+  el.innerHTML = `
+    <div class="terminal-container">
+      <div class="terminal-loading" id="terminal-loading">
+        <div class="terminal-loading-spinner"></div>
+        <div class="terminal-loading-text">Starting new AI session...</div>
+        <div class="terminal-loading-sub" id="terminal-loading-sub">Initializing</div>
+      </div>
+      <div id="terminal-xterm" style="display:none;width:100%;height:100%"></div>
+      <div class="terminal-overlay" id="terminal-overlay" style="display:none">
+        <div class="terminal-overlay-msg" id="terminal-overlay-msg"></div>
+        <button class="btn btn-primary btn-sm" id="terminal-overlay-action" style="display:none">Reconnect</button>
+      </div>
+    </div>`;
+  // No serverURL or sessionID — OpenCodeTUI will discover the managed server
+  OpenCodeTUI.open({});
 }
 
 /* ========================================================================
@@ -1840,18 +1936,275 @@ function formatTime(t) {
   return d.toLocaleDateString();
 }
 
-function formatMessageText(text) {
-  if (!text) return '';
-  let safe = esc(text);
-  safe = safe.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
-  safe = safe.replace(/`([^`]+)`/g, '<code>$1</code>');
-  safe = safe.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  return safe;
-}
-
 function showLoading(on) {
   document.getElementById('loading-bar').style.display = on ? 'block' : 'none';
 }
+
+/* ========================================================================
+   OpenCodeTUI — Universal xterm.js + PTY bridge for OpenCode sessions
+   ========================================================================
+   Usage:
+     OpenCodeTUI.open({ serverURL, sessionID?, title? })
+       - serverURL: the OpenCode server URL (e.g. http://127.0.0.1:PORT)
+       - sessionID: (optional) attach to existing session with --continue
+       - title:     (optional) display title for the header
+     OpenCodeTUI.destroy()   — teardown terminal + PTY
+     OpenCodeTUI.reconnect() — destroy + re-open with same opts
+     OpenCodeTUI.isActive()  — true if a terminal is currently running
+   ======================================================================== */
+const OpenCodeTUI = {
+  // Internal state
+  _terminalId: null,
+  _ws: null,
+  _term: null,
+  _fitAddon: null,
+  _webglAddon: null,
+  _resizeObserver: null,
+  _destroyed: false,
+  _currentOpts: null,   // { serverURL, sessionID?, title? } — kept for reconnect
+
+  /**
+   * Open an OpenCode TUI terminal.
+   * @param {Object} opts
+   * @param {string} opts.serverURL  - OpenCode server URL
+   * @param {string} [opts.sessionID] - Session to attach to (omit for new session)
+   * @param {string} [opts.title]     - Display title
+   */
+  async open(opts = {}) {
+    const self = OpenCodeTUI;
+    self._destroyed = false;
+    self._currentOpts = opts;
+
+    const container = document.getElementById('terminal-xterm');
+    const loadingEl = document.getElementById('terminal-loading');
+    const loadingSub = document.getElementById('terminal-loading-sub');
+    if (!container) return;
+
+    // --- 1. Create xterm instance ---
+    const term = new Terminal({
+      cursorBlink: true,
+      fontSize: 14,
+      fontFamily: "'JetBrains Mono', 'Cascadia Code', 'Fira Code', 'SF Mono', Consolas, monospace",
+      theme: {
+        background: '#0f1117',
+        foreground: '#e8ecf4',
+        cursor: '#4C8BF5',
+        selectionBackground: 'rgba(76,139,245,0.3)',
+        black: '#1c1f2b',
+        red: '#F87171',
+        green: '#34D399',
+        yellow: '#FBBF24',
+        blue: '#4C8BF5',
+        magenta: '#a882ff',
+        cyan: '#22D3EE',
+        white: '#e8ecf4',
+        brightBlack: '#5f6880',
+        brightRed: '#FCA5A5',
+        brightGreen: '#6EE7B7',
+        brightYellow: '#FDE68A',
+        brightBlue: '#93C5FD',
+        brightMagenta: '#C4B5FD',
+        brightCyan: '#67E8F9',
+        brightWhite: '#F8FAFC',
+      },
+      allowProposedApi: true,
+    });
+
+    const fitAddon = new FitAddon.FitAddon();
+    term.loadAddon(fitAddon);
+    self._term = term;
+    self._fitAddon = fitAddon;
+
+    // Try WebGL renderer for performance
+    try {
+      const webglAddon = new WebglAddon.WebglAddon();
+      term.loadAddon(webglAddon);
+      self._webglAddon = webglAddon;
+    } catch (e) {
+      console.warn('WebGL addon failed, using canvas renderer:', e);
+    }
+
+    term.open(container);
+    fitAddon.fit();
+
+    // --- 2. Resolve server URL ---
+    let serverURL = opts.serverURL;
+    if (!serverURL) {
+      // No explicit URL — discover from managed server endpoint
+      if (loadingSub) loadingSub.textContent = 'Discovering OpenCode server...';
+      try {
+        const msResp = await fetch('/api/managed-server');
+        if (!msResp.ok) {
+          const msErr = await msResp.json().catch(() => ({ error: msResp.statusText }));
+          throw new Error(msErr.error || 'No managed server available');
+        }
+        const msData = await msResp.json();
+        serverURL = msData.url;
+        // Store for reconnect
+        self._currentOpts.serverURL = serverURL;
+      } catch (e) {
+        if (loadingSub) loadingSub.textContent = 'Failed: ' + e.message;
+        return;
+      }
+    }
+
+    // --- 3. Build opencode attach args ---
+    const args = ['attach'];
+    if (opts.sessionID) {
+      args.push('--session', opts.sessionID, '--continue');
+    }
+    args.push(serverURL);
+
+    // --- 4. Spawn PTY terminal via REST API ---
+    if (loadingSub) {
+      loadingSub.textContent = opts.sessionID
+        ? 'Attaching to session...'
+        : 'Starting new session...';
+    }
+    try {
+      const cols = term.cols;
+      const rows = term.rows;
+      const resp = await fetch('/api/terminal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command: 'opencode', args, cols, rows }),
+      });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({ error: resp.statusText }));
+        throw new Error(err.error || resp.statusText);
+      }
+      const data = await resp.json();
+      self._terminalId = data.id;
+    } catch (e) {
+      if (loadingSub) loadingSub.textContent = 'Failed: ' + e.message;
+      return;
+    }
+
+    // --- 5. Connect WebSocket for bidirectional I/O ---
+    if (loadingSub) loadingSub.textContent = 'Connecting...';
+    try {
+      const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = proto + '//' + location.host + '/api/terminal/' + self._terminalId + '/ws';
+      const ws = new WebSocket(wsUrl);
+      ws.binaryType = 'arraybuffer';
+      self._ws = ws;
+
+      ws.onopen = () => {
+        if (loadingEl) loadingEl.style.display = 'none';
+        container.style.display = 'block';
+        fitAddon.fit();
+        term.focus();
+      };
+
+      ws.onmessage = (evt) => {
+        if (self._destroyed) return;
+        if (evt.data instanceof ArrayBuffer) {
+          term.write(new Uint8Array(evt.data));
+        }
+      };
+
+      ws.onclose = () => {
+        if (self._destroyed) return;
+        self._showOverlay('Terminal session ended.');
+      };
+
+      ws.onerror = () => {
+        if (self._destroyed) return;
+        self._showOverlay('WebSocket connection error.');
+      };
+    } catch (e) {
+      if (loadingSub) loadingSub.textContent = 'WebSocket failed: ' + e.message;
+      return;
+    }
+
+    // --- 6. Wire terminal input -> WebSocket (binary) ---
+    term.onData((data) => {
+      if (self._ws && self._ws.readyState === WebSocket.OPEN) {
+        self._ws.send(new TextEncoder().encode(data));
+      }
+    });
+
+    // --- 7. Wire resize events ---
+    term.onResize(({ cols, rows }) => {
+      if (self._ws && self._ws.readyState === WebSocket.OPEN) {
+        self._ws.send(JSON.stringify({ type: 'resize', cols, rows }));
+      }
+    });
+
+    // --- 8. Auto-fit on container resize ---
+    self._resizeObserver = new ResizeObserver(() => {
+      if (!self._destroyed && self._fitAddon) {
+        try { self._fitAddon.fit(); } catch (e) {}
+      }
+    });
+    self._resizeObserver.observe(container);
+  },
+
+  /** Tear down the terminal, WebSocket, and backend PTY. */
+  destroy() {
+    const self = OpenCodeTUI;
+    self._destroyed = true;
+    if (self._resizeObserver) {
+      self._resizeObserver.disconnect();
+      self._resizeObserver = null;
+    }
+    if (self._ws) {
+      self._ws.close();
+      self._ws = null;
+    }
+    if (self._term) {
+      self._term.dispose();
+      self._term = null;
+    }
+    self._fitAddon = null;
+    self._webglAddon = null;
+    if (self._terminalId) {
+      fetch('/api/terminal/' + self._terminalId, { method: 'DELETE' }).catch(() => {});
+      self._terminalId = null;
+    }
+  },
+
+  /** Destroy and re-open with the same options. */
+  reconnect() {
+    const self = OpenCodeTUI;
+    const opts = self._currentOpts;
+    self.destroy();
+    const el = document.getElementById('page-content');
+    if (!el) return;
+    // Re-render the appropriate page which will call open() again
+    if (state.page === 'chat') {
+      renderChat(el);
+    } else if (state.page === 'tui') {
+      renderTUI(el);
+    }
+  },
+
+  /** True if a terminal is currently running. */
+  isActive() {
+    return OpenCodeTUI._terminalId !== null && !OpenCodeTUI._destroyed;
+  },
+
+  /** Show the reconnect overlay. */
+  _showOverlay(message) {
+    const overlay = document.getElementById('terminal-overlay');
+    const msgEl = document.getElementById('terminal-overlay-msg');
+    const actionBtn = document.getElementById('terminal-overlay-action');
+    if (!overlay) return;
+    overlay.style.display = 'flex';
+    if (msgEl) msgEl.textContent = message || '';
+    if (actionBtn) {
+      actionBtn.style.display = 'inline-flex';
+      actionBtn.textContent = 'Reconnect';
+      actionBtn.onclick = () => OpenCodeTUI.reconnect();
+    }
+  },
+
+  /** Hide the overlay. */
+  _hideOverlay() {
+    const overlay = document.getElementById('terminal-overlay');
+    if (overlay) overlay.style.display = 'none';
+  },
+};
 
 /* ========================================================================
    Init
@@ -1862,7 +2215,7 @@ async function init() {
   showLoading(false);
   render();
 
-  // Auto-refresh every 10s for live views
+  // Auto-refresh every 10s for live views (skip terminal pages)
   setInterval(async () => {
     if (['dashboard', 'servers', 'sessions'].includes(state.page)) {
       await Promise.all([fetchServers(), fetchSessions()]);
@@ -1880,6 +2233,14 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault();
     refreshAll();
   }
+});
+
+// Network status → terminal overlay
+window.addEventListener('offline', () => {
+  if (['chat', 'tui'].includes(state.page)) OpenCodeTUI._showOverlay('Network connection lost.');
+});
+window.addEventListener('online', () => {
+  if (['chat', 'tui'].includes(state.page)) OpenCodeTUI._hideOverlay();
 });
 
 init();

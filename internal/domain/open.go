@@ -37,3 +37,14 @@ type OpenPlan struct {
 	Sessions    []Session    // active sessions for this environment (may be empty)
 	Action      OpenAction   // what the driver should do
 }
+
+// ProjectOpenPlan is the Project-first equivalent of OpenPlan. It carries
+// a *Project instead of an *Environment and adds server presence info.
+// During the migration period both plan types may coexist; drivers choose
+// which to consume based on whether they've migrated to the project model.
+type ProjectOpenPlan struct {
+	Project      *Project   // the resolved project
+	Sessions     []Session  // active sessions for this project (may be empty)
+	Action       OpenAction // what the driver should do
+	ServerOnline bool       // true if a coding-agent server is running for this project
+}

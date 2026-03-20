@@ -8,10 +8,11 @@ import "time"
 type Session struct {
 	ID              string    // provider-assigned session ID
 	Title           string    // session title
+	NodeID          string    // stable node ID that hosts this session (empty during migration)
 	EnvironmentName string    // matched Orbit environment name (empty if unmatched)
 	EnvironmentPath string    // the environment path that matched (empty if unmatched)
-	ServerDir       string    // the server's working directory
-	ServerPort      int       // the port of the server hosting this session
+	ServerDir       string    // the server's working directory (deprecated: use NodeID)
+	ServerPort      int       // the port of the server hosting this session (deprecated: use NodeID)
 	Status          string    // "idle", "busy", "retry", or "unknown"
 	CreatedAt       time.Time // session creation time
 	UpdatedAt       time.Time // session last update time

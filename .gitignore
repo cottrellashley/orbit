@@ -1,3 +1,7 @@
 # Go binaries
 /orbit
 /orbitd
+
+# Frontend
+web/node_modules/
+web/dist/

@@ -13,20 +13,20 @@ type SessionProvider interface {
 	// DiscoverServers scans for running coding-agent servers.
 	DiscoverServers(ctx context.Context) ([]domain.Server, error)
 
-	// ListSessions returns all sessions from a specific server.
-	ListSessions(ctx context.Context, server domain.Server) ([]domain.Session, error)
+	// ListSessions returns all sessions from a specific node.
+	ListSessions(ctx context.Context, node domain.Node) ([]domain.Session, error)
 
-	// GetSession fetches a single session by ID from a specific server.
-	GetSession(ctx context.Context, server domain.Server, sessionID string) (*domain.Session, error)
+	// GetSession fetches a single session by ID from a specific node.
+	GetSession(ctx context.Context, node domain.Node, sessionID string) (*domain.Session, error)
 
-	// CreateSession creates a new session on a specific server.
-	CreateSession(ctx context.Context, server domain.Server, title string) (*domain.Session, error)
+	// CreateSession creates a new session on a specific node.
+	CreateSession(ctx context.Context, node domain.Node, title string) (*domain.Session, error)
 
-	// AbortSession stops a running session.
-	AbortSession(ctx context.Context, server domain.Server, sessionID string) error
+	// AbortSession stops a running session on the given node.
+	AbortSession(ctx context.Context, node domain.Node, sessionID string) error
 
-	// DeleteSession removes a session from its server.
-	DeleteSession(ctx context.Context, server domain.Server, sessionID string) error
+	// DeleteSession removes a session from the given node.
+	DeleteSession(ctx context.Context, node domain.Node, sessionID string) error
 
 	// IsInstalled reports whether the coding agent binary is available.
 	IsInstalled() bool

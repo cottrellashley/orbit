@@ -72,9 +72,9 @@ func (a *Adapter) DiscoverServers(ctx context.Context) ([]domain.Server, error) 
 	return servers, nil
 }
 
-// ListSessions returns all sessions from the given server.
-func (a *Adapter) ListSessions(ctx context.Context, server domain.Server) ([]domain.Session, error) {
-	client := a.clientFor(server)
+// ListSessions returns all sessions from the given node.
+func (a *Adapter) ListSessions(ctx context.Context, node domain.Node) ([]domain.Session, error) {
+	client := a.clientFor(node)
 
 	sessions, err := client.Session.List(ctx, opencode.SessionListParams{})
 	if err != nil {
@@ -86,14 +86,18 @@ func (a *Adapter) ListSessions(ctx context.Context, server domain.Server) ([]dom
 
 	result := make([]domain.Session, 0, len(*sessions))
 	for _, s := range *sessions {
-		result = append(result, toDomainSession(s, server, statuses))
+		// Skip sub-sessions (children of another session).
+		if s.ParentID != "" {
+			continue
+		}
+		result = append(result, toDomainSession(s, node, statuses))
 	}
 	return result, nil
 }
 
-// GetSession fetches a single session by ID from the given server.
-func (a *Adapter) GetSession(ctx context.Context, server domain.Server, sessionID string) (*domain.Session, error) {
-	client := a.clientFor(server)
+// GetSession fetches a single session by ID from the given node.
+func (a *Adapter) GetSession(ctx context.Context, node domain.Node, sessionID string) (*domain.Session, error) {
+	client := a.clientFor(node)
 
 	s, err := client.Session.Get(ctx, sessionID, opencode.SessionGetParams{})
 	if err != nil {
@@ -101,13 +105,13 @@ func (a *Adapter) GetSession(ctx context.Context, server domain.Server, sessionI
 	}
 
 	statuses := a.fetchStatuses(ctx, client)
-	ds := toDomainSession(*s, server, statuses)
+	ds := toDomainSession(*s, node, statuses)
 	return &ds, nil
 }
 
-// CreateSession creates a new session on the given server.
-func (a *Adapter) CreateSession(ctx context.Context, server domain.Server, title string) (*domain.Session, error) {
-	client := a.clientFor(server)
+// CreateSession creates a new session on the given node.
+func (a *Adapter) CreateSession(ctx context.Context, node domain.Node, title string) (*domain.Session, error) {
+	client := a.clientFor(node)
 
 	params := opencode.SessionNewParams{}
 	if title != "" {
@@ -119,13 +123,13 @@ func (a *Adapter) CreateSession(ctx context.Context, server domain.Server, title
 		return nil, fmt.Errorf("opencode create session: %w", err)
 	}
 
-	ds := toDomainSession(*s, server, nil)
+	ds := toDomainSession(*s, node, nil)
 	return &ds, nil
 }
 
-// AbortSession stops a running session on the given server.
-func (a *Adapter) AbortSession(ctx context.Context, server domain.Server, sessionID string) error {
-	client := a.clientFor(server)
+// AbortSession stops a running session on the given node.
+func (a *Adapter) AbortSession(ctx context.Context, node domain.Node, sessionID string) error {
+	client := a.clientFor(node)
 	_, err := client.Session.Abort(ctx, sessionID, opencode.SessionAbortParams{})
 	if err != nil {
 		return fmt.Errorf("opencode abort session %s: %w", sessionID, err)
@@ -133,9 +137,9 @@ func (a *Adapter) AbortSession(ctx context.Context, server domain.Server, sessio
 	return nil
 }
 
-// DeleteSession removes a session from the given server.
-func (a *Adapter) DeleteSession(ctx context.Context, server domain.Server, sessionID string) error {
-	client := a.clientFor(server)
+// DeleteSession removes a session from the given node.
+func (a *Adapter) DeleteSession(ctx context.Context, node domain.Node, sessionID string) error {
+	client := a.clientFor(node)
 	_, err := client.Session.Delete(ctx, sessionID, opencode.SessionDeleteParams{})
 	if err != nil {
 		return fmt.Errorf("opencode delete session %s: %w", sessionID, err)
@@ -161,9 +165,9 @@ func (a *Adapter) Version(ctx context.Context) (string, error) {
 // Internal helpers
 // ---------------------------------------------------------------------------
 
-// clientFor creates an SDK client targeting a specific server.
-func (a *Adapter) clientFor(server domain.Server) *opencode.Client {
-	baseURL := fmt.Sprintf("http://%s:%d", server.Hostname, server.Port)
+// clientFor creates an SDK client targeting a specific node.
+func (a *Adapter) clientFor(node domain.Node) *opencode.Client {
+	baseURL := fmt.Sprintf("http://%s:%d", node.Hostname, node.Port)
 	opts := make([]option.RequestOption, 0, len(a.clientOpts)+1)
 	opts = append(opts, option.WithBaseURL(baseURL))
 	opts = append(opts, a.clientOpts...)
@@ -202,13 +206,14 @@ func toDomainServer(d discoveredServer) domain.Server {
 }
 
 // toDomainSession converts an SDK Session to a domain.Session,
-// enriching it with server info and optional status data.
-func toDomainSession(s opencode.Session, server domain.Server, statuses map[string]sessionStatus) domain.Session {
+// enriching it with node info and optional status data.
+func toDomainSession(s opencode.Session, node domain.Node, statuses map[string]sessionStatus) domain.Session {
 	ds := domain.Session{
 		ID:         s.ID,
 		Title:      s.Title,
-		ServerDir:  server.Directory,
-		ServerPort: server.Port,
+		NodeID:     node.ID,
+		ServerDir:  node.Directory, // deprecated: kept for backward compat
+		ServerPort: node.Port,      // deprecated: kept for backward compat
 		Status:     "unknown",
 		CreatedAt:  time.UnixMilli(int64(s.Time.Created)),
 		UpdatedAt:  time.UnixMilli(int64(s.Time.Updated)),
